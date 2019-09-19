@@ -9,9 +9,6 @@ semantics to to Jon Sterling's cumulative algebraic TT paper:
 
   https://arxiv.org/abs/1902.08848
 
-This requires cumulativity (obviously), Russell universes and tranfinite universes because
-the standard model for Jon's TT requires Setω for the interpretation of contexts.
-
 Prior art that I know about:
   - Conor:
       https://personal.cis.strath.ac.uk/conor.mcbride/pub/Hmm/Hier.agda
@@ -20,49 +17,14 @@ Prior art that I know about:
       thesis: https://pdfs.semanticscholar.org/fc9a/5a2a904a7dff3562bcf31275d4b029894b5f.pdf
               section 8.1.3
 
-However, these don't support Russell and transfinite universes.
+However, these don't simultaneously support cumulativity and lift computation on
+type formers.
 
 -}
 
+module OrdinalUniverses where
 
--- Preliminaries
---------------------------------------------------------------------------------
-
-open import Data.Empty
-open import Data.Product renaming (proj₁ to ₁; proj₂ to ₂)
-open import Data.Sum
-open import Function
-open import Induction.WellFounded
-open import Relation.Binary
-open import Relation.Binary.PropositionalEquality
-
-coe : ∀ {α}{A B : Set α} → A ≡ B → A → B
-coe refl x = x
-
-_&_ = cong;  infixl 9 _&_; {-# DISPLAY cong  = _&_ #-}
-_◾_ = trans; infixr 4 _◾_; {-# DISPLAY trans = _◾_ #-}
-_⁻¹ = sym;   infix  6 _⁻¹; {-# DISPLAY sym   = _⁻¹ #-}
-
-coe∘ : ∀ {i}{A B C : Set i}(p : B ≡ C)(q : A ≡ B)(a : A)
-       → coe p (coe q a) ≡ coe (q ◾ p) a
-coe∘ refl refl _ = refl
-
-UIP : ∀ {i}{A : Set i}{x y : A}{p q : x ≡ y} → p ≡ q
-UIP {p = refl}{refl} = refl
-
--- function extensionality
-postulate
-  ext : ∀{i j}{A : Set i}{B : A → Set j}{f g : (x : A) → B x}
-        → ((x : A) → f x  ≡ g x) → f ≡ g
-
-  exti : ∀{i j}{A : Set i}{B : A → Set j}{f g : ∀ {x} → B x}
-          → ((x : A) → f {x} ≡ g {x}) → (λ {x} → f {x}) ≡ g
-
-unAcc : ∀ {α β A R i} → Acc {α}{β}{A} R i → ∀ j → R j i → Acc R j
-unAcc (acc f) = f
-
-Acc-prop : ∀ {α β A R i}(p q : Acc {α}{β}{A} R i) → p ≡ q
-Acc-prop (acc f) (acc g) = acc & ext λ j → ext λ p → Acc-prop (f j p) (g j p)
+open import Lib
 
 --------------------------------------------------------------------------------
 
@@ -162,8 +124,8 @@ module IR-Univ (lvl : LevelStructure) where
   El↑ p ℕ'       = refl
   El↑ p Lvl'     = refl
   El↑ p (i <' j) = refl
-  El↑ p (Π' a b) rewrite El↑ p a = (λ f → ∀ x → f x) & ext (El↑ p ∘ b)
-  El↑ p (Σ' a b) rewrite El↑ p a = ∃ & ext (El↑ p ∘ b)
+  El↑ p (Π' a b) rewrite El↑ p a = (λ f → ∀ x → f x) & ext (El↑ p F.∘ b)
+  El↑ p (Σ' a b) rewrite El↑ p a = ∃ & ext (El↑ p F.∘ b)
 
   -- conveniences
   --------------------------------------------------------------------------------
@@ -181,33 +143,101 @@ module IR-Univ (lvl : LevelStructure) where
   ↑U p a = ↑ p (coe U↓-compute a)
 
 
-  -- Example for supporting cumulative Russell universes in TT
+
+  -- Example fragment of a model for Jon's TT
+  -- Many omitted parts are awful to formalize.
   --------------------------------------------------------------------------------
-  private
-    Con : Lvl → Set
-    Con = U
-    -- Jon Sterling has instead Con : Set, and his contexts are interpreted as U Top
-    -- where Top is a chosen level such that every syntactic level is
-    -- interpreted below it. The reason for this is that we'd like to just ignore
-    -- context levels and lifts in the syntax of our TT.
+  module JonTT where
+    Con : Set₁
+    Con = Set
 
-    Ty : ∀ {i} → Con i → Lvl → Set
-    Ty Γ j = El Γ → U j
+    Ty : Con → Lvl → Set
+    Ty Γ j = Γ → U j
 
-    Tm : ∀ {i} Γ {j} → Ty {i} Γ j → Set
-    Tm Γ A = (γ : El Γ) → El (A γ)
+    Tm : ∀ Γ {i} → Ty Γ i → Set
+    Tm Γ A = (γ : Γ) → El (A γ)
 
-    ↑Ty : ∀ {j k i Γ} → j < k → Ty {i} Γ j → Ty Γ k
-    ↑Ty p A γ = ↑ p (A γ)
+    Sub : Con → Con → Set
+    Sub Γ Δ = Γ → Δ
 
-    Cumulative : ∀ {i Γ j k p A} → Tm Γ A ≡ Tm Γ (↑Ty {j}{k}{i}{Γ} p A)
+    lift : ∀ {Γ i j} → i < j → Ty Γ i → Ty Γ j
+    lift p A γ = ↑ p (A γ)
+
+    infixl 5 _[_]T
+    _[_]T : ∀ {Γ Δ i} → Ty Δ i → Sub Γ Δ → Ty Γ i
+    _[_]T A σ γ = A (σ γ)
+
+    lift[]T : ∀ {Γ Δ i j p σ A} → lift {Δ}{i}{j} p A [ σ ]T ≡ lift {Γ} p (A [ σ ]T)
+    lift[]T = refl
+
+    Cumulative : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (lift {Γ}{i}{j} p A)
     Cumulative {p = p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ p (A γ) ⁻¹
 
-    u : ∀ {i Γ j k} → j < k → Ty {i} Γ k
+    u : ∀ {Γ i j} → i < j → Ty Γ j
     u p _ = U' p
 
-    Russell : ∀ {i Γ j k p} → Tm Γ (u {i}{Γ}{j}{k} p) ≡ Ty Γ j
-    Russell = (λ f → ∀ x → f x) & ext λ γ → U↓-compute
+    Russell : ∀ {Γ i j p} → Tm Γ (u {Γ}{i}{j} p) ≡ Ty Γ i
+    Russell = (λ f → ∀ x → f x) & ext λ _ → U↓-compute
+
+    infixl 4 _▶_
+    _▶_ : (Γ : Con) → ∀ {i} → Ty Γ i → Con
+    Γ ▶ A = Σ Γ λ γ → El (A γ)
+
+    ▶lift : ∀ {Γ i j A}{p : i < j} → (Γ ▶ A) ≡ (Γ ▶ lift p A)
+    ▶lift {Γ}{A = A}{p} = Σ Γ & ext λ γ → El↑ p (A γ) ⁻¹
+
+    Π : ∀ {Γ i}(A : Ty Γ i) → Ty (Γ ▶ A) i → Ty Γ i
+    Π {Γ}{i} A B γ = Π' (A γ) λ α → B (γ , α)
+
+    lam : ∀ {Γ i A B} → Tm (Γ ▶ A) B → Tm Γ {i} (Π A B)
+    lam t γ α = t (γ , α)
+
+    app : ∀ {Γ i A B} → Tm Γ {i} (Π A B) → Tm (Γ ▶ A) B
+    app t (γ , α) = t γ α
+
+
+  -- Example for TT with internalized levels
+  --------------------------------------------------------------------------------
+  module InternalLevelTT where
+
+    Con : Set₁
+    Con = Set
+
+    -- levels in context
+    Level : Con → Set
+    Level Γ = Γ → Lvl
+
+    Ty : (Γ : Con) → Level Γ → Set
+    Ty Γ i = (γ : Γ) → U (i γ)
+
+    Tm : (Γ : Con) → ∀ {i} → Ty Γ i → Set
+    Tm Γ {i} A = (γ : Γ) → El (A γ)
+
+    Level' : ∀ {Γ i} → Ty Γ i
+    Level' {Γ}{i} γ = Lvl'
+
+    -- "Russell-style" levels
+    RussellLevel : ∀ {Γ i} → Tm Γ (Level' {Γ}{i}) ≡ Level Γ
+    RussellLevel = refl
+
+    Lt : ∀ {Γ i} → Level Γ → Level Γ → Ty Γ i
+    Lt i j γ = i γ <' j γ
+
+    Trs : ∀ {Γ l i j k} → Tm Γ {l} (Lt i j) → Tm Γ {l} (Lt j k) → Tm Γ {l} (Lt i k)
+    Trs t u γ = trs (t γ) (u γ)
+
+    lift : ∀ {Γ}{i j : Level Γ} → Tm Γ {j} (Lt i j) → Ty Γ i → Ty Γ j
+    lift {i = i}{j} p A γ = ↑ (p γ) (A γ)
+
+    Cumulative : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (lift {Γ}{i}{j} p A)
+    Cumulative {Γ}{i}{j}{p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ (p γ) (A γ) ⁻¹
+
+    u : ∀ {Γ i j} → Tm Γ {j} (Lt i j) → Ty Γ j
+    u p γ = U' (p γ)
+
+    RussellUniv : ∀ {Γ i j p} → Tm Γ (u {Γ}{i}{j} p) ≡ Ty Γ i
+    RussellUniv = (λ f → ∀ x → f x) & ext λ γ → U↓-compute
+
 
 
 -- Additional assumption:
@@ -286,7 +316,7 @@ module IR-Univ-StrictTotal {lvl} (strictTotal : StrictTotalLevel lvl) where
         → F' a₀ b₀ ≡ F' a₁ b₁
   ΠΣ≡ {i} {l} F' {a₀} refl {b₀} {b₁} b₂ = F' a₀ & ext b₂
 
-  -- Composing lifts. Jon Sterling also requires this equation.
+  -- Composing lifts
   ↑↑ : ∀ {i j k}(p : i < j)(q : j < k) a → ↑ q (↑ p a) ≡ ↑ (trs p q) a
   ↑↑ p q (U' r)   = U' & <-prop -- alternative: require associative trs
   ↑↑ p q ℕ'       = refl
