@@ -1,6 +1,7 @@
 
 {-
-Inductive-recursive universes, indexed by levels which are below an arbitrary type-theoretic ordinal number (see HoTT book 10.3). This includes all kinds of transfinite levels as well.
+Inductive-recursive universes, indexed by levels which are below an arbitrary type-theoretic ordinal number 
+(see HoTT book 10.3). This includes all kinds of transfinite levels as well.
 
 Checked with: Agda 2.6.0.1, stdlib 1.0
 
