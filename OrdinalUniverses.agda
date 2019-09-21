@@ -18,7 +18,7 @@ Prior art that I know about:
       thesis: https://pdfs.semanticscholar.org/fc9a/5a2a904a7dff3562bcf31275d4b029894b5f.pdf
               section 8.1.3
 
-However, these don't simultaneously support Russel universes and commuting lifts on type formers.
+However, these don't simultaneously support Russell universes and commuting lifts on type formers.
 
 -}
 
