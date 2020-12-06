@@ -1,2 +1,3 @@
+
 # universes
-Exploration of syntax, semantics of various type universe hierarchies
+Generalized universe hierarchies. See also: https://www.youtube.com/watch?v=uvWLnwW-QsA

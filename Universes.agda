@@ -1,60 +1,28 @@
 
-{-
-Inductive-recursive universes, indexed by levels which are below an arbitrary type-theoretic ordinal number (see HoTT book 10.3). This includes all kinds of transfinite levels as well.
-
-Checked with: Agda 2.6.0.1, stdlib 1.0
-
-My original motivation was to give inductive-recursive (or equivalently: large inductive)
-semantics to to Jon Sterling's cumulative algebraic TT paper:
-
-  https://arxiv.org/abs/1902.08848
-
-Prior art that I know about:
-  - Conor:
-      https://personal.cis.strath.ac.uk/conor.mcbride/pub/Hmm/Hier.agda
-  - Larry Diehl:
-      gist:   https://gist.github.com/larrytheliquid/3909860
-      thesis: https://pdfs.semanticscholar.org/fc9a/5a2a904a7dff3562bcf31275d4b029894b5f.pdf
-              section 8.1.3
-
-However, these don't simultaneously support cumulativity and lift computation on
-type formers.
-
--}
-
-module OrdinalUniverses where
+module Universes where
 
 open import Lib
 
---------------------------------------------------------------------------------
-
--- We demand that a type of levels has a well-founded transitive relation.
--- This is the same as the definition of an ordinal in HoTT book 10.3, except
--- that we don't require extensionality, and don't yet require <-irrelevance.
-
-record LevelStructure : Set₁ where
+-- well-founded semicategory
+record WfSemiCat : Set₁ where
   infix 4 _<_
+  infixr 5 _∘_
   field
     Lvl         : Set
     _<_         : Lvl → Lvl → Set
-    trs         : ∀ {i j k} → i < j → j < k → i < k
+    _∘_         : ∀ {i j k} → j < k → i < j → i < k
+    ass         : ∀ {i j k l}{f : k < l}{g}{h : i < j} → f ∘ g ∘ h ≡ (f ∘ g) ∘ h
     instance wf : ∀ {i} → Acc _<_ i
 
-  <-irrefl : ∀ {i} → i < i → ⊥
-  <-irrefl {i} p = go wf p where
+  acyclic : ∀ {i} → i < i → ⊥
+  acyclic {i} p = go wf p where
     go : ∀ {i} → Acc _<_ i → i < i → ⊥
     go {i} (acc f) q = go (f i q) q
 
 
--- Given any level structure, we have a cumulative IR universe hierarchy.
-
-module IR-Univ (lvl : LevelStructure) where
-  open LevelStructure lvl public
+module IR-Univ (lvl : WfSemiCat) where
+  open WfSemiCat lvl public
   open import Data.Nat hiding (_<_; _≤_)
-
-  -- The actual IR type of codes. We already assume semantics for the "i" level
-  -- when we define UU, in order to avoid positivity issues.
-  --------------------------------------------------------------------------------
 
   infix 4 _<'_
 
@@ -62,38 +30,26 @@ module IR-Univ (lvl : LevelStructure) where
   EL : ∀ {i l} → UU {i} l → Set
 
   data UU {i} l where
-    U'    : ∀ {j} → j < i → UU l   -- cumulativity appears here first, but
-                                   -- it will be extended to other types as well
+    U'    : ∀ {j} → j < i → UU l
     ℕ'    : UU l
+    Π' Σ' : (a : UU l) → (EL a → UU l) → UU l
 
-    -- We make it possible to write bounded level-polymorphic functions,
-    -- by internalizing Lvl and _<_ in codes.
+    -- used for internal levels
     Lvl'  : UU l
     _<'_  : Lvl → Lvl → UU l
 
-    Π' Σ' : (a : UU l) → (EL a → UU l) → UU l
-
-  EL {_}{l}(U' p) = l _ p  -- we just refer to the semantics of levels
+  EL {_}{l}(U' p) = l _ p
   EL ℕ'           = ℕ
   EL Lvl'         = Lvl
   EL (i <' j)     = i < j
   EL (Π' a b)     = ∀ x → EL (b x)
   EL (Σ' a b)     = ∃ λ x → EL (b x)
 
-  -- Interpreting levels
+  -- Interpreting levels & lifts
   --------------------------------------------------------------------------------
 
-  -- U↓ i assigns a set to every j below i.
-
-  -- We would like the defining equation as follows:
-  --    U↓ : ∀ i j → i < j → Set
-  --    U↓ {i} j p = UU (U↓ {j})
-
-  -- However, this is not a well-founded definition, so we instead define U↓ by
-  -- recursion on _<_ accessibility.
-
   U↓ : ∀ {i} {{_ : Acc _<_ i}} j → j < i → Set
-  U↓ {i} {{acc f}} j p = UU (U↓ {{f j p}})
+  U↓ {i} {{acc f}} j p = UU {j} (U↓ {{f j p}})
 
   U : Lvl → Set
   U i = UU (U↓ {i})
@@ -104,28 +60,50 @@ module IR-Univ (lvl : LevelStructure) where
   U↓-compute : ∀ {i a j p} → U↓ {i}{{a}} j p ≡ U j
   U↓-compute {i} {acc f} {j} {p} = (λ a → UU (U↓ {{a}})) & Acc-prop (f j p) wf
 
-
-  -- Cumulativity
-  --------------------------------------------------------------------------------
-
-  -- cumulativity means that
-  --   a) every type can be lifted to higher levels
-  --   b) lifting doesn't change sets of elements of types
-
   ↑   : ∀ {i j} → i < j → U i → U j
   El↑ : ∀ {i j} p a → El (↑ {i}{j} p a) ≡ El a
-  ↑   p (U' q)   = U' (trs q p)
+  ↑   p (U' q)   = U' (p ∘ q)
   ↑   p ℕ'       = ℕ'
   ↑   p Lvl'     = Lvl'
   ↑   p (i <' j) = i <' j
   ↑   p (Π' a b) = Π' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
   ↑   p (Σ' a b) = Σ' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
-  El↑ p (U' q)   = U↓-compute ◾ U↓-compute ⁻¹
+  El↑ p (U' q)   = U↓-compute {p = p ∘ q} ◾ U↓-compute {p = q} ⁻¹
   El↑ p ℕ'       = refl
   El↑ p Lvl'     = refl
   El↑ p (i <' j) = refl
   El↑ p (Π' a b) rewrite El↑ p a = (λ f → ∀ x → f x) & ext (El↑ p F.∘ b)
   El↑ p (Σ' a b) rewrite El↑ p a = ∃ & ext (El↑ p F.∘ b)
+
+  -- congruence helper
+  ΠΣ≡ : ∀ {i}{l : ∀ j → j < i → Set}
+          (F' : (a : UU l) → (EL a → UU l) → UU l)
+          {a₀ a₁ : UU l}(a₂ : a₀ ≡ a₁)
+          {b₀ : EL a₀ → UU l}{b₁ : EL a₁ → UU l}
+        → (∀ x → b₀ x ≡ b₁ (coe (EL & a₂) x))
+        → F' a₀ b₀ ≡ F' a₁ b₁
+  ΠΣ≡ {i} {l} F' {a₀} refl {b₀} {b₁} b₂ = F' a₀ & ext b₂
+
+  -- functorial lifting
+  ↑∘ : ∀ {i j k}(p : i < j)(q : j < k) a → ↑ q (↑ p a) ≡ ↑ (q ∘ p) a
+  ↑∘ p q (U' r)   = U' & ass
+  ↑∘ p q ℕ'       = refl
+  ↑∘ p q Lvl'     = refl
+  ↑∘ p q (i <' j) = refl
+  ↑∘ p q (Π' a b) =
+    ΠΣ≡ Π' (↑∘ p q a)
+        (λ x → ↑∘ p q _
+             ◾ (λ x → ↑ (q ∘ p) (b x)) &
+                  (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
+                ◾ (λ y → coe y x) & UIP
+                ◾ coe∘ (El↑ (q ∘ p) a) (EL & ↑∘ p q a) x ⁻¹))
+  ↑∘ p q (Σ' a b) =
+    ΠΣ≡ Σ' (↑∘ p q a)
+        (λ x → ↑∘ p q _
+             ◾ (λ x → ↑ (q ∘ p) (b x)) &
+                  (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
+                ◾ (λ y → coe y x) & UIP
+                ◾ coe∘ (El↑ (q ∘ p) a) (EL & ↑∘ p q a) x ⁻¹))
 
   -- conveniences
   --------------------------------------------------------------------------------
@@ -143,10 +121,10 @@ module IR-Univ (lvl : LevelStructure) where
   ↑U p a = ↑ p (coe U↓-compute a)
 
 
-
   -- Example fragment of a model for Jon's TT
   -- Many omitted parts are awful to formalize.
   --------------------------------------------------------------------------------
+
   module JonTT where
     Con : Set₁
     Con = Set
@@ -196,8 +174,9 @@ module IR-Univ (lvl : LevelStructure) where
     app t (γ , α) = t γ α
 
 
-  -- Example for TT with internalized levels
+  -- Internalized levels
   --------------------------------------------------------------------------------
+
   module InternalLevelTT where
 
     Con : Set₁
@@ -223,8 +202,8 @@ module IR-Univ (lvl : LevelStructure) where
     Lt : ∀ {Γ i} → Level Γ → Level Γ → Ty Γ i
     Lt i j γ = i γ <' j γ
 
-    Trs : ∀ {Γ l i j k} → Tm Γ {l} (Lt i j) → Tm Γ {l} (Lt j k) → Tm Γ {l} (Lt i k)
-    Trs t u γ = trs (t γ) (u γ)
+    Comp : ∀ {Γ l i j k} → Tm Γ {l} (Lt i j) → Tm Γ {l} (Lt j k) → Tm Γ {l} (Lt i k)
+    Comp t u γ = u γ ∘ t γ
 
     lift : ∀ {Γ}{i j : Level Γ} → Tm Γ {j} (Lt i j) → Ty Γ i → Ty Γ j
     lift {i = i}{j} p A γ = ↑ (p γ) (A γ)
@@ -248,13 +227,13 @@ module IR-Univ (lvl : LevelStructure) where
 pattern inj₂₁ x  = inj₂ (inj₁ x)
 pattern inj₂₂ x  = inj₂ (inj₂ x)
 
-
 -- Corresponds to classical ordinal in HoTT book 10.4 without extensionality
-record StrictTotalLevel (lvl : LevelStructure) : Set where
-  open LevelStructure lvl
+record Ordinal (lvl : WfSemiCat) : Set where
+  open WfSemiCat lvl
   field
     cmp    : ∀ i j → i < j ⊎ j < i ⊎ i ≡ j
     <-prop : ∀ {i j}{p q : i < j} → p ≡ q
+    <-ext  : ∀ {i j} → (∀ k → (k < i → k < j) × (k < j → k < i)) → i ≡ j
 
   _≤_ : Lvl → Lvl → Set; infix 4 _≤_
   i ≤ j = i < j ⊎ i ≡ j
@@ -285,12 +264,12 @@ record StrictTotalLevel (lvl : LevelStructure) : Set where
 
   ≤-prop : ∀ {i j}{p q : i ≤ j} → p ≡ q
   ≤-prop {p = inj₁ p}    {inj₁ q}    = inj₁ & <-prop
-  ≤-prop {p = inj₁ p}    {inj₂ refl} = ⊥-elim (<-irrefl p)
-  ≤-prop {p = inj₂ refl} {inj₁ q}    = ⊥-elim (<-irrefl q)
+  ≤-prop {p = inj₁ p}    {inj₂ refl} = ⊥-elim (acyclic p)
+  ≤-prop {p = inj₂ refl} {inj₁ q}    = ⊥-elim (acyclic q)
   ≤-prop {p = inj₂ p}    {inj₂ q}    = inj₂ & UIP
 
-module IR-Univ-StrictTotal {lvl} (strictTotal : StrictTotalLevel lvl) where
-  open StrictTotalLevel strictTotal public
+module IR-Univ-Ordinal {lvl} (ord : Ordinal lvl) where
+  open Ordinal ord public
   open IR-Univ lvl public
 
   -- non-strict lifts
@@ -307,36 +286,6 @@ module IR-Univ-StrictTotal {lvl} (strictTotal : StrictTotalLevel lvl) where
   Π'' : ∀ {i j}(a : U i) → (El a → U j) → U (i ⊔ j)
   Π'' {i}{j} a b = Π' (↑≤ (⊔₁ i j) a) λ x → ↑≤ (⊔₂ i j) (b (coe (El↑≤ (⊔₁ i j) a) x))
 
-  -- congruence helper
-  ΠΣ≡ : ∀ {i}{l : ∀ j → j < i → Set}
-          (F' : (a : UU l) → (EL a → UU l) → UU l)
-          {a₀ a₁ : UU l}(a₂ : a₀ ≡ a₁)
-          {b₀ : EL a₀ → UU l}{b₁ : EL a₁ → UU l}
-        → (∀ x → b₀ x ≡ b₁ (coe (EL & a₂) x))
-        → F' a₀ b₀ ≡ F' a₁ b₁
-  ΠΣ≡ {i} {l} F' {a₀} refl {b₀} {b₁} b₂ = F' a₀ & ext b₂
-
-  -- Composing lifts
-  ↑↑ : ∀ {i j k}(p : i < j)(q : j < k) a → ↑ q (↑ p a) ≡ ↑ (trs p q) a
-  ↑↑ p q (U' r)   = U' & <-prop -- alternative: require associative trs
-  ↑↑ p q ℕ'       = refl
-  ↑↑ p q Lvl'     = refl
-  ↑↑ p q (i <' j) = refl
-  ↑↑ p q (Π' a b) =
-    ΠΣ≡ Π' (↑↑ p q a)
-        (λ x → ↑↑ p q _
-             ◾ (λ x → ↑ (trs p q) (b x)) &
-                  (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
-                ◾ (λ y → coe y x) & UIP
-                ◾ coe∘ (El↑ (trs p q) a) (EL & ↑↑ p q a) x ⁻¹))
-  ↑↑ p q (Σ' a b) =
-    ΠΣ≡ Σ' (↑↑ p q a)
-        (λ x → ↑↑ p q _
-             ◾ (λ x → ↑ (trs p q) (b x)) &
-                  (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
-                ◾ (λ y → coe y x) & UIP
-                ◾ coe∘ (El↑ (trs p q) a) (EL & ↑↑ p q a) x ⁻¹))
-
 
 -- Examples
 --------------------------------------------------------------------------------
@@ -345,14 +294,15 @@ module IR-Univ-StrictTotal {lvl} (strictTotal : StrictTotalLevel lvl) where
 module ℕ-example where
   open import Data.Nat
   open import Data.Nat.Properties
-  open import Induction.Nat
+  open import Data.Nat.Induction
 
-  lvl : LevelStructure
+  lvl : WfSemiCat
   lvl = record {
       Lvl = ℕ
     ; _<_ = _<_
-    ; trs = <-trans
+    ; _∘_ = λ p q → <-trans q p
     ; wf  = <-wellFounded _
+    ; ass = <-irrelevant _ _
     }
 
   open IR-Univ lvl hiding (_<_)
@@ -372,25 +322,32 @@ module ℕ*ℕ-example where
 
   import Data.Nat as N
   open import Data.Nat.Properties
-  open import Induction.Nat
+  open import Data.Nat.Induction
   open Lexicographic N._<_ (λ _ → N._<_)
 
-  trs : ∀ {i j k} → i < j → j < k → i < k
-  trs (left  p) (left  q) = left (<-trans p q)
+  trs : ∀ {i j k} → j < k → i < j → i < k
+  trs (left  p) (left  q) = left (<-trans q p)
   trs (left  p) (right q) = left p
   trs (right p) (left  q) = left q
-  trs (right p) (right q) = right (<-trans p q)
+  trs (right p) (right q) = right (<-trans q p)
+
+  <-irr : ∀{x y}(a b : x < y) → a ≡ b
+  <-irr (left  p) (left  q) = left & <-irrelevant _ _
+  <-irr (left  p) (right q) = ⊥-elim (<-irrefl refl p)
+  <-irr (right p) (left  q) = ⊥-elim (<-irrefl refl q)
+  <-irr (right p) (right q) = right & <-irrelevant _ _
 
   --  representation: (i, j) ~ (ω*i + j)
-  lvl : LevelStructure
+  lvl : WfSemiCat
   lvl = record {
       Lvl = N.ℕ × N.ℕ
     ; _<_ = _<_
-    ; trs = trs
+    ; _∘_ = trs
     ; wf  = wellFounded <-wellFounded <-wellFounded _
+    ; ass = <-irr _ _
     }
 
-  open IR-Univ lvl hiding (_<_; trs)
+  open IR-Univ lvl hiding (_<_)
 
   -- raise by 1
   <suc : ∀ {i j} → (i , j) < (i , N.suc j)
@@ -417,27 +374,3 @@ module ℕ*ℕ-example where
 
   fω+2 : El {ω + # 2} (U' (trs <suc <suc) ⇒' U' <suc)
   fω+2 = ↑U <suc
-
-
--- W-types as levels.
--- It's clear that pretty much any inductive type has LvlStructure, although many of
--- them don't have StrictTotal structure.
-module W-example (Sh : Set)(Pos : Sh → Set) where
-
-  data W : Set where
-    sup : ∀ s → (Pos s → W) → W
-
-  infix 4 _<_
-  data _<_ : W → W → Set where
-    here  : ∀ {s f s*}   → f s* < sup s f
-    there : ∀ {x s f s*} → x < f s* → x < sup s f
-
-  trs : ∀ {i j k} → i < j → j < k → i < k
-  trs p here      = there p
-  trs p (there q) = there (trs p q)
-
-  wf : ∀ w → Acc _<_ w
-  wf (sup s f) = acc λ {_ here → wf _; y (there p) → unAcc (wf _) y p}
-
-  lvl : LevelStructure
-  lvl = record { Lvl = W ; _<_ = _<_ ; trs = trs ; wf = wf _ }
