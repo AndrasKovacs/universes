@@ -1,0 +1,146 @@
+
+Universes.
+
+- Idea: - category with families
+        - 1 category + ∙ (terminal object), multiple family structures (Ty, Tm, context extension)
+	- morphisms between family structures ("lifting" operations)
+
+   - Multimodal TT: multiple CwFs and a bunch of certain morphisms between them  ("diagram" of CwFs)
+   - here: one category + bunch of family structures  ("diagram" of fams)
+
+
+1. CwF + usual type formers, with large elimination, *no* universe
+
+   Large elimination:
+
+     BoolTyRec : Ty Γ → Ty Γ → Tm Γ Bool → Ty Γ
+     BoolInd   : (B : Ty (Γ, Bool)) → Tm Γ (B[b, true]) → Tm Γ (B[b, false]) → (b : Tm Γ Bool) → Tm Γ (B[id, b])
+
+2. Multiple copies of Ty/Tm
+
+   set of levels
+   Ty,Tm indexed by levels
+   Tyᵢ, Tmᵢ
+   Boolᵢ : Tyᵢ Γ
+
+   -- no interaction between Fam (Ty, Tm, context extension)
+
+3. Add some Fam morphisms
+
+morphism: natural transformation on types and terms
+
+  -- 2 level TT: levels
+
+         c
+      0 --> 1
+
+  + c is an isomorphism on terms
+
+  A : Ty₀ Γ       c A : Ty₁ Γ
+
+  (lift, lower) : Tm₀ Γ A ~ Tm₁ Γ (c A)
+
+  I can only go from Bool₁ to Bool₀, not the other way around ("downward" elimination)
+
+
+4. Eliminate into arbitrary levels:
+
+  - Lift preserves all type/term formers
+
+           Lift
+       0   --->   1
+
+  t : Tm₀ Γ A         then    lift t : Tm₁ Γ (Lift A)
+  t : Tm₁ Γ (Lift A)  then    lower t : Tm₀ Γ A
+
+  Lift Bool₀   = Bool₁
+  Lift (A → B) = Lift A → Lift A
+  Lift (A × B) = Lift A × Lift B
+
+  lift true₀ = true₁
+  -- lift/lower also computes on terms
+
+     (if we don't have above equation, Bool₁ has lift true₀, lift false₀, true₁,
+      false₁ as canonical elements)   (Luo note on universes)
+
+  in the context, b : Bool₀
+
+    lift b : Bool₁
+    BoolInd (lift b) .... : return in any type in Ty₁
+
+  (I don't get any interesting feature, because Boolᵢ ~ Boolⱼ, similarly for other type formers)
+
+
+5. Add universes
+
+  U : (i : Level){j : Level} → i < j → Tyⱼ Γ
+
+  U₀ : Ty₁ Γ
+  U₁ : Ty₂ Γ
+
+  -- why is this nice?
+  -- 1. In every Famᵢ we have exactly the same U (in level 0 we don't have U because _ < 0)
+  -- 2. Lifting preserving Uᵢ still works, also uniformly
+
+  Lift(i,j) : lifting from i to j, s.t. i < j
+
+     (_<_ must be transitive)
+  assumptions:  Uₖ : Tyᵢ Γ     p : k < i     q : i < j
+  Lift(i,j) (Uₖ {i} {p}) = Uₖ {j} {p ∘ q}
+
+  Lift Bool₀ = Bool₁    (lifting Bool₀ to an equivalent type)
+  Lift Uᵢ = Uᵢ          (the same thing)
+
+
+6. What kind of universes (Coquand/Russell)?
+
+  Coquand universes:
+
+    (El, c) : Tmⱼ Γ Uᵢ ~ Tyᵢ Γ
+
+  (very similar to MLTT + predication universe hierarchy)
+
+  Russell:
+
+    Tmⱼ Γ Uᵢ = Tyᵢ Γ   (types and terms identified)
+
+
+7. Jon Sterling style cumulativity
+
+  - Tmᵢ Γ A = Tm Γ (Lift(i,j) A)
+  - (Γ, x : A) = (Γ, x : Lift A)
+
+  we still need conditions on term preservation
+
+  previously:     lift(i,j) trueᵢ = trueⱼ
+
+  now it becomes: assuming i < j, trueᵢ = trueⱼ
+
+  true₀ : Tm₀ Γ Bool₀
+        : Tm₁ Γ (Lift Bool₀)
+	: Tm₁ Γ Bool₁
+
+  true₀ = true₁
+
+
+8. Coq cumulativity (cumulative subtyping)
+
+  for example in Coq:
+
+  f : Bool₀ → Set₀
+
+      implicitly coerce:
+
+  f : Bool₁ → Set₁
+
+  λ x. Lift (f (lower x)) : Bool₁ → Set₁
+
+  -- coercions along such subtyping
+  -- inductive types participate in subtyping
+  -- (nicer to have elaboration insert coercions)
+
+
+-- Semantics
+--------------------------------------------------------------------------------
+
+-- I have semantics which supports Jon Sterling style cumulative universes

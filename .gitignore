@@ -1,0 +1,5 @@
+*~
+*.agdai
+.stack-work/
+*.o
+*.hi
