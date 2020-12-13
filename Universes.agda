@@ -219,15 +219,14 @@ module IR-Univ (lvl : WfSemiCat) where
 
 
 
--- Additional assumption:
--- proof-irrelevant, strict total ordering for levels.
--- This is a realistic assumption for notions of TT models and for type checking.
+-- Additional assumption: levels are ordinals (as in HoTT book 10.4). 
+-- This is a realistic assumption for notions of TT models and for type checking,
+-- and makes it possible to have least-upper-bound reasoning.
 --------------------------------------------------------------------------------
 
 pattern inj₂₁ x  = inj₂ (inj₁ x)
 pattern inj₂₂ x  = inj₂ (inj₂ x)
 
--- Corresponds to classical ordinal in HoTT book 10.4 without extensionality
 record Ordinal (lvl : WfSemiCat) : Set where
   open WfSemiCat lvl
   field
