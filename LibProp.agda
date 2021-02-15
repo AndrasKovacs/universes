@@ -1,17 +1,18 @@
+{-# OPTIONS --prop --show-irrelevant #-}
 
-module Lib where
+module LibProp where
 
 open import Data.Unit using (⊤; tt) public
 open import Data.Empty using (⊥; ⊥-elim) public
 open import Data.Product renaming (proj₁ to ₁; proj₂ to ₂) public
 open import Data.Sum using (_⊎_; inj₁; inj₂) public
 open import Function hiding (id; _∘_) public
-open import Induction.WellFounded public
 open import Relation.Binary public
 open import Relation.Binary.PropositionalEquality
   hiding (decSetoid; preorder; setoid) public
-
 import Level as L
+
+import Induction.WellFounded as Wf
 
 module F where
   open import Function public
@@ -35,24 +36,35 @@ postulate
   ext : ∀{i j}{A : Set i}{B : A → Set j}{f g : (x : A) → B x}
         → ((x : A) → f x  ≡ g x) → f ≡ g
 
+  extP : ∀{i j}{A : Prop i}{B : A → Set j}{f g : (x : A) → B x}
+         → ((x : A) → f x  ≡ g x) → f ≡ g
+
   exti : ∀{i j}{A : Set i}{B : A → Set j}{f g : ∀ {x} → B x}
           → ((x : A) → f {x} ≡ g {x}) → (λ {x} → f {x}) ≡ g
 
-unAcc : ∀ {α β A R i} → Acc {α}{β}{A} R i → ∀ j → R j i → Acc R j
+record Prf {α} (A : Prop α) : Set α where
+  constructor prf
+  field
+    unprf : A
+open Prf public
+
+data Squash {α}(A : Set α) : Prop α where
+  squash : A → Squash A
+
+data Acc {i j}{A : Set i} (R : A → A → Prop j) (a : A) : Set (i L.⊔ j) where
+  acc : (∀ a' → R a' a → Acc R a') → Acc R a
+
+unAcc : ∀ {α β A R a} → Acc {α}{β}{A} R a → ∀ a' → R a' a → Acc R a'
 unAcc (acc f) = f
 
 Acc-prop : ∀ {α β A R i}(p q : Acc {α}{β}{A} R i) → p ≡ q
-Acc-prop (acc f) (acc g) = acc & ext λ j → ext λ p → Acc-prop (f j p) (g j p)
+Acc-prop {R = R} (acc f) (acc g) = acc & ext λ j → extP λ p → Acc-prop (f j p) (g j p)
 
-happly : ∀ {α β}{A : Set α}{B : Set β}{f g : A → B} → f ≡ g → ∀ a → f a ≡ g a
-happly refl a = refl
+-- Acc-unprf : ∀ {α β A R i} → Acc {α}{β} {A} R i → Wf.Acc {α}{β}{A} (λ x y → Prf (R x y)) i
+-- Acc-unprf (acc f) = Wf.acc (λ x p → Acc-unprf (f x (unprf p)))
 
-_⊗_ :
-  ∀ {α β}{A : Set α}{B : Set β}
-    {f g : A → B}(p : f ≡ g){a a' : A}(q : a ≡ a')
-  → f a ≡ g a'
-refl ⊗ refl = refl
-infixl 8 _⊗_
+-- Acc-prf : ∀ {α β A R i} → Wf.Acc {α}{β}{A} (λ x y → Prf (R x y)) i → Acc {α}{β} {A} R i
+-- Acc-prf (Wf.acc f) = acc (λ x p → Acc-prf (f x (prf p)))
 
-data W {α}{β}(A : Set α) (B : A → Set β) : Set (α L.⊔ β) where
-  sup : (a : A) → (B a → W A B) → W A B
+-- Acc-squash : ∀ {α β A R i} → Wf.Acc {α}{β}{A} R i → Acc {α}{β} {A} (λ x y → Squash (R x y)) i
+-- Acc-squash (Wf.acc f) = acc (λ x p → {!!})

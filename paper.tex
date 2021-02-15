@@ -1,0 +1,345 @@
+
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+%This is a template for producing LIPIcs articles.
+%See lipics-v2021-authors-guidelines.pdf for further information.
+%for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
+%for british hyphenation rules use option "UKenglish", for american hyphenation rules use option "USenglish"
+%for section-numbered lemmas etc., use "numberwithinsect"
+%for enabling cleveref support, use "cleveref"
+%for enabling autoref support, use "autoref"
+%for anonymousing the authors (e.g. for double-blind review), add "anonymous"
+%for enabling thm-restate support, use "thm-restate"
+%for enabling a two-column layout for the author/affilation part (only applicable for > 6 authors), use "authorcolumns"
+%for producing a PDF according the PDF/A standard, add "pdfa"
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\bibliographystyle{plainurl}% the mandatory bibstyle
+
+\title{Generalized Universe Hierarchies and First-Class Universe Levels}
+%% \titlerunning{Dummy short title} %TODO optional, please use if title is longer than one line
+
+\author{András Kovács}{Eötvös Loránd University, Hungary}{kovacsandras@inf.elte.hu}{https://orcid.org/0000-0002-6375-9781}{}
+
+%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional
+\authorrunning{A., Kovács} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases):
+
+\Copyright{András Kovács} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003752.10003790.10011740</concept_id>
+<concept_desc>Theory of computation~Type theory</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Theory of computation~Type theory}
+
+\keywords{type theory, universes} %TODO mandatory; please add comma-separated list of keywords
+
+%% \category{} %optional, e.g. invited paper
+
+\relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
+%\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
+
+%\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+%\supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version} %linktext, cite, and subcategory are optional
+
+\funding{The author was supported by the European Union,
+co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
+
+
+%\nolinenumbers %uncomment to disable line numbering
+
+%\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\EventEditors{John Q. Open and Joan R. Access}
+\EventNoEds{2}
+\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+\EventShortTitle{CVIT 2016}
+\EventAcronym{CVIT}
+\EventYear{2016}
+\EventDate{December 24--27, 2016}
+\EventLocation{Little Whinging, United Kingdom}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+
+
+%% --------------------------------------------------------------------------------
+
+
+\usepackage{xcolor}
+\usepackage{mathpartir}
+\usepackage{todonotes}
+\presetkeys{todonotes}{inline}{}
+\usepackage{scalerel}
+\usepackage{amssymb}
+
+
+%% \theoremstyle{definition}
+%% \newtheorem{definition}{Definition}
+%% \newtheorem{example}{Example}
+
+%% \theoremstyle{theorem}
+%% \newtheorem{theorem}{Theorem}
+%% \newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{notation}{Notation}
+
+\theoremstyle{definition}
+\newtheorem{mydefinition}{Definition}
+\newtheorem{myexample}{Example}
+
+
+%% Abbrevs
+%% --------------------------------------------------------------------------------
+
+\newcommand{\Set}[1]{\mathsf{Set_{#1}}}
+\newcommand{\Seti}{\mathsf{Set}}
+\newcommand{\refl}{\mathsf{refl}}
+\newcommand{\Con}{\mathsf{Con}}
+\newcommand{\Ty}{\mathsf{Ty}}
+\newcommand{\Tm}{\mathsf{Tm}}
+\newcommand{\Sub}{\mathsf{Sub}}
+\newcommand{\emptycon}{\scaleobj{.75}\bullet}
+\newcommand{\U}{\mathsf{U}}
+\newcommand{\El}{\mathsf{El}}
+\newcommand{\id}{\mathsf{id}}
+\newcommand{\ext}{\triangleright}
+\newcommand{\blank}{\mathord{\hspace{1pt}\text{--}\hspace{1pt}}}
+\newcommand{\mi}[1]{\mathit{#1}}
+\newcommand{\p}{\mathsf{p}}
+\newcommand{\q}{\mathsf{q}}
+
+\renewcommand{\tt}{\mathsf{tt}}
+
+
+%% --------------------------------------------------------------------------------
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In type theories, universe hierarchies are commonly used to increase the
+expressive power of the theory while avoiding inconsistencies arising from size
+issues. There are numerous ways to specify universe hierarchies, and theories
+may differ in details of cumulativity, choice of universe levels, specification
+of type formers and eliminators, and available internal operations on levels. In
+the current work, we aim to provide a framework which covers a large part of the
+design space. First, we develop syntax and semantics for cumulative universe
+hierarchies, where levels may come from any set equipped with a transitive
+well-founded ordering. In the semantics, we show that induction-recursion can be
+used to model transfinite hierarchies, and also support lifting operations on
+type codes which strictly preserve type formers. Then, we consider a setup where
+universe levels are first-class types and subject to arbitrary internal
+reasoning. This generalizes the bounded universe polymorphism features of Coq
+and also the internal level computations in Agda.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Users of type theories often view universe levels as an unwieldy bureaucratic
+detail, a necessary annoyance in service of boosting expressive power while
+retaining logical consistency. However, universe hierarchies are not going away
+any time soon in practical implementations of type theory. In recent
+developments of systems, we are getting more universes and more adjacent
+features:
+
+\begin{itemize}
+\item Agda recently added a limited version cumulativity as an optional feature
+  for universes, and the upcoming 2.6.2 version will extend the $\omega+1$
+  universe hierarchy to $\omega*2$.
+\item Coq added support for cumulative inductive types \cite{timany18cumulative}, and added a form of
+  bounded universe polymorphism \cite{ziliani15unification}.
+\end{itemize}
+
+\noindent At this point, there is a veritable zoo of universe features in existing
+implementations. We have perhaps even more design choices when considering the
+formal metatheory of type theories. Do type formers stay in the same
+universe, or take the $\sqcup$ of universes of constituent types? Can
+eliminators target any universe, or do we instead use lifting operators to cross
+levels? What kind of universe polymorphism do we have, can we quantify over
+bounds? Is there a type of levels, or are levels in a separate syntactic layer?
+
+The aim of the current work is to develop semantics which covers as much as
+possible from the range of sensible universe features. This way, theorists and
+language implementors can grab a desired bag of features, and be able to show
+consistency of their system by a straightforward translation to one of the
+systems in this paper.
+
+\paragraph*{Contributions}
+
+\begin{enumerate}
+\item In Section \ref{sec:ttgu} we describe models of type theories where
+  universe levels may come from any set with a well-founded transitive ordering
+  relation. We specify models as categories equipped with level-indexed diagrams
+  of families, as a variation on categories with families. Each morphism of
+  levels is mapped to a lifting operation on terms and types. By varying the
+  preservation properties of lifting operations, we can describe a range of
+  stratification features, from two-level type theory to cumulative universes.
+\item We use induction-recursion to model the mentioned theories. Here, we model
+  the strongest formulations for lifting and universes, namely cumulative
+  universes with Russell-style type decoding. The main challenge is combining
+  transfinite hierarchies with strictly type-preserving lifting operations.
+\item In Section \ref{sec:ttfl} we describe type theories with internal types
+  for levels and level morphisms, and extend the previous inductive-recursive
+  semantics to cover these as well. Here, we can additionally represent various
+  universe polymorphism features and level computations. We illustrate how
+  predicative universe features in Coq and Agda could be justified in our framework.
+\end{enumerate}
+
+\noindent Several related topics are not handled in this paper.
+
+\begin{itemize}
+
+\item
+Besides consistency, we are often interested in \emph{canonicity},
+\emph{normalization} or other metatheoretical properties. The current work
+focuses on consistency and leaves other properties to future work. However, we
+do keep canonicity in mind while specifying our systems, and aim to avoid
+pitfalls which would cause canonicity to fail.
+\item
+We only focus on using universes as sized-based classifiers for
+types. Universe-like stratification is also present in two-level type theory
+\cite{twolevel}, modal type theories \cite{gratzer20multimodal} or as h-levels
+in homotopy type theory \cite{hottbook}, but we do not attempt to cover such use
+cases.
+\item
+We only cover predicative hierarchies.
+\end{itemize}
+
+We provide an Agda formalization of the contents of the paper. The formalization
+is not complete, as we skip the proofs involving an over-abundance of equality
+coercions (which are more suited to informal reasoning, using equality
+reflection), and instead focus on the key points.
+
+\section{Metatheory}
+\label{sec:metatheory}
+
+We work in a Martin-Löf type which has the following features.
+\begin{itemize}
+  \item Two universes named $\Set0$ and $\Set1$, where $\Set0$ supports
+    inductive-recursive types (IR) as specified by Dybjer and Setzer
+    \cite{dybjer99finite}. The $\Set1$ universe is not essential and we only use
+    it as a convenience feature, in this paper and in the Agda formalization. We
+    may omit the universe indices if they can be inferred or if we work over
+    arbitrary indices.
+  \item Function extensionality and uniqueness of identity proofs
+    (UIP). Additionally, we assume equality reflection in this paper, thus
+    working in extensional type theory, to avoid noise from equality transports.
+  \item We write function types as $(x : A)\to B$ with $\lambda\,x.\,t$
+    inhabitants, and $\Sigma$-types as $(x : A) \times B$, with pairing as
+    $(t,\, u)$ and projections as $t.1$ and $t.2$. We have $\top$ as the unit
+    type with inhabitant $\tt$, and $\bot$ as the empty type. Propositional identity
+    is written as $t = u$ with $\refl : t = t$.
+  \item We occasionally use $\{x : A\} \to B$ for an Agda-like notation for
+    function types with implicit arguments, and omit implicit applications
+    whenever they can be inferred.
+
+\end{itemize}
+
+\section{Type Theories with Generalized Universe Hierarchies}
+\label{sec:ttgu}
+
+In this section, we first describe notions of models for type theories with
+generalized universes, and discuss several variations of universes and lifting
+operations. Then, we pick a concrete variant (the ``strongest'', in a sense)
+and construct a model for it in the metatheory.
+
+For the basic structure of typing contexts and substitutions, let us review
+categories with families.
+
+\begin{mydefinition}[Category with family (CwF), c.f. \cite{Dybjer96internaltype}]\label{def:cwf}
+A CwF consists of the following data:
+\begin{itemize}
+\item A category with a terminal object. We denote the set of objects as $\Con :
+  \Seti$ and use capital Greek letters starting from $\Gamma$ to refer to
+  objects. The set of morphisms is $\Sub : \Con \to \Con \to \Seti$, and we use
+  $\sigma$, $\delta$ and so on to refer to morphisms. The terminal object is
+  $\emptycon$ with unique morphism $\epsilon : \Sub\,\Gamma\,\emptycon$. In
+  initial models (that is, syntaxes) of type theories, objects correspond to
+  typing contexts, morphisms to parallel substitutions and the terminal object to
+  the empty context; this informs the naming scheme that we use here.
+\item A \emph{family structure}, containing $\Ty : \Con \to \Seti$ and $\Tm :
+  (\Gamma : \Con) \to \Ty\,\Gamma \to \Seti$, where $\Ty$ is a presheaf over the
+  category of contexts and $\Tm$ is a presheaf over the category of elements of
+  $\Ty$. This means that both types ($\Ty$) and terms ($\Tm$) can be
+  substituted, and substitution has functorial action. We use $A$, $B$, $C$ to
+  refer to types and $t$, $u$, $v$ to refer to terms, and use $A[\sigma]$ and
+  $t[\sigma]$ for substituting types and terms. Additionally, a family
+  structure has \emph{context comprehension} which consists of an operation
+  $\blank\ext\blank : (\Gamma : \Con) \to \Ty\,\Gamma \to \Con$ together with an
+  isomorphism $\Sub\,\Gamma\,(\Delta\ext A) \simeq ((\sigma : \Sub\,\Gamma\,\Delta)
+  \times \Tm\,\Gamma\,(A[\sigma]))$ which is natural in $\Gamma$.
+\end{itemize}
+\end{mydefinition}
+
+\noindent From the comprehension structure, we recover the following notions:
+
+\begin{itemize}
+\item By going right-to-left along the isomorphism, we recover \emph{substitution extension}
+      $\blank,\blank : (\sigma : \Sub\,\Gamma\,\Delta) \to \Tm\,\Gamma\,(A[\sigma])$. This means
+      that starting from $\epsilon$ or the identity substitution $\id$, we can iterate $\blank,\blank$
+      to build substitutions as lists of terms.
+\item By going left-to-right, and starting from $\id : \Sub\,(\Gamma\ext A)\,(\Gamma\ext A)$, we recover
+      the \emph{weakening substitution} $\p : \Sub\,(\Gamma\ext A)\,\Gamma$ and the \emph{zero variable}
+      $\q : \Tm\,(\Gamma\ext A)\,(A[\p])$.
+\item By weakening $\q$, we recover a notion of variables as De Bruijn indices. In general, the $n$-th
+      De Bruijn index is defined as $\q[\p^{n}]$, where $\p^{n}$ denotes $n$-fold composition.
+\end{itemize}
+
+notions of substitution extension, weakening
+and variables, internally to any CwF.
+
+
+
+\subsection{Categories with Families}
+\label{sec:categories_with_families}
+
+\subsection{Morphisms, Lifts and Inclusions of Families}
+\label{sec:morphisms}
+
+morphisms, lifts (2ltt), inclusions, strict inclusion (cumulative)
+
+\subsection{Level Structures}
+\label{sec:level_structures}
+
+Level structures, thin direct semicat, vs thin cat, direct semicat, direct cat
+
+\subsection{Universes}
+\label{sec:universes}
+
+Coquand, Russell, naturality, large elimination examples
+Lifting of universes
+No lifting naturality for (El,Code)!
+
+\section{Semantics}
+\label{sec:semantics}
+
+\subsection{Inductive-Recursive Codes}
+\label{sec:inductive_recursive_codes}
+
+IR codes, code lifting, properties,
+
+\subsection{Model}
+
+List a bunch of things in the model.
+
+\section{Type Theories with First-Class Universe Levels}
+\label{sec:ttfl}
+
+Specification of the theory
+
+
+
+%% --------------------------------------------------------------------------------
+
+
+\bibliography{references}
+\end{document}

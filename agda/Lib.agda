@@ -1,4 +1,6 @@
 
+
+
 module Lib where
 
 open import Data.Unit using (⊤; tt) public
@@ -9,7 +11,7 @@ open import Function hiding (id; _∘_) public
 open import Induction.WellFounded public
 open import Relation.Binary public
 open import Relation.Binary.PropositionalEquality
-  hiding (decSetoid; preorder; setoid) public
+  hiding (decSetoid; preorder; setoid; [_]) public
 
 import Level as L
 

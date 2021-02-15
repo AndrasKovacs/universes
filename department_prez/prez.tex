@@ -1,0 +1,219 @@
+\documentclass[dvipsnames,10pt,aspectratio=169]{beamer}
+\usetheme{metropolis}           % Use metropolis theme
+
+
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{fontspec}
+\usepackage{proof}
+\usepackage{tikz-cd}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{hyperref}
+\hypersetup{colorlinks,linkcolor=blue,urlcolor=blue}
+\setmonofont[Scale=0.7]{DejaVu Sans Mono}
+
+\bibliographystyle{alpha}
+\setbeamerfont{bibliography item}{size=\footnotesize}
+\setbeamerfont{bibliography entry author}{size=\footnotesize}
+\setbeamerfont{bibliography entry title}{size=\footnotesize}
+\setbeamerfont{bibliography entry location}{size=\footnotesize}
+\setbeamerfont{bibliography entry note}{size=\footnotesize}
+\setbeamertemplate{bibliography item}{}
+
+
+%% --------------------------------------------------------------------------------
+
+\title{Universes In Type Theory}
+\date{January 29, 2021, PLC Department Workshop}
+\author{\vspace{-1em}András Kovács\footnote{The author was supported by the European Union, co-financed by the
+European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).\vspace{0.5em}}}
+\institute{Eötvös Loránd University, Budapest}
+\begin{document}
+\maketitle
+
+%% ------------------------------------------------------------
+
+\begin{frame}{Russell's paradox, or size issues}
+
+There is no set $S$ in a consistent set theory such that $x \in S$ iff $x \notin x$.
+\vspace{1em}
+
+Alternate formulations:
+\begin{itemize}
+  \item Barber's paradox
+  \item No set of all sets
+\end{itemize}
+\vspace{1em}
+
+Related:
+\begin{itemize}
+  \item Real numbers are uncountable
+  \item Gödel's first incompleteness theorem
+  \item Undecidability of halting
+\end{itemize}
+\vspace{1em}
+
+{\footnotesize (All instances of \href{https://arxiv.org/pdf/math/0305282.pdf}{Lawvere's fixed point theorem)}}
+\end{frame}
+
+%% ------------------------------------------------------------
+
+\begin{frame}{Solution with universes}
+
+Solving Russell's paradox: set comprehension can only define a \textbf{subset} of a set.
+\vspace{1em}
+
+But sometimes we still want to quantify over \textbf{all sets} of
+Zermelo-Fraenkel set theory.
+\vspace{1em}
+
+We can assume the existence of a very large set such that all of ZF can fit there,
+which is called a \textbf{universe}. Then, just quantify over elements of the
+universe. The resulting theory is stronger than ZF.
+\vspace{1em}
+
+If we want quantify over sets which \textbf{don't} fit (or universes
+themselves), we can just assume even more universes.
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Universes in type theory}
+
+Agda:
+\begin{verbatim}
+  Bool          : Set₀
+  Set₀          : Set₁
+  Set₁          : Set₂
+  (Bool → Set₀) : Set₁
+  (Set₀ → Bool) : Set₁
+\end{verbatim}
+
+Assuming \texttt{Set₀ : Set₀} implies contradiction (by Russell-like argument).
+\vspace{1em}
+
+{\small(But type theory with \texttt{Set₀ : Set₀} is still a perfectly good Turing-complete
+programming language)}
+\vspace{1em}
+
+\end{frame}
+
+\begin{frame}[fragile]{Universes in type theory}
+
+The basic system can be tedious:
+\begin{verbatim}
+  id₀ : (A : Set₀) → A → A
+  id₁ : (A : Set₁) → A → A
+  ...
+\end{verbatim}
+
+In Coq/Agda/Lean, various extra features are used.
+Example: universe polymorphism in Agda:
+\begin{verbatim}
+  id : (l : Level)(A : Set l) → A → A
+  id l A x = x
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Design choices and variations}
+
+\textbf{How many universes?} Agda/Coq: countably many.
+\vspace{1em}
+
+\textbf{Are universes totally ordered?} Agda/Coq: yes.
+\vspace{1em}
+
+\textbf{What kind of level polymorphism?}. Coq: bounded polymorphism. Agda: no
+bounds allowed. Bounded example:
+\begin{verbatim}
+  myId : (l : Level) → l < 3 → (A : Set l) → A → A
+  myId l p A x = x
+\end{verbatim}
+
+\textbf{What kind of operations are available on levels?} Agda is more liberal than Coq. Example:
+\begin{verbatim}
+  ℕtoLevel : ℕ → Level
+\end{verbatim}
+
+
+\textbf{Are universes cumulative} Agda: no. Coq: yes. Cumulativity: whenever \texttt{A : Set i}, we also have \texttt{A : Set (i + 1)}.
+
+\end{frame}
+
+\begin{frame}{Research goals}
+
+We want to know that each point in the design space makes sense.
+\vspace{1em}
+
+Making sense:
+\begin{itemize}
+  \item Logical consistency.
+  \item Is the type theory a proper programming language? Programs should compute to values
+        and not get randomly stuck.
+  \item Is type checking decidable? (I don't plan to cover this in research).
+\end{itemize}
+
+Approach: use generic framework to cover as many features/variations as
+possible. Prove that everything in the framework is sensible.
+
+
+\end{frame}
+
+
+\begin{frame}{Results}
+
+Framework covers:
+\begin{enumerate}
+  \item Universe levels may come from any well-ordered set.
+  \item Polymorphism with bounds is allowed.
+  \item Universes are cumulative.
+  \item Levels can be manipulated arbitrarily as program data (WIP).
+\end{enumerate}
+
+Things we need to assume in order to prove the framework sensible:
+\begin{enumerate}
+  \item \textbf{Two} universes.
+  \item Types of certain infinitely branching trees (W-types).
+\end{enumerate}
+
+Potential further applications (in future work):
+\begin{itemize}
+  \item Information flow type systems (``secure'' and ``public'' levels).
+  \item Staged compilation (``runtime'' and ``compile time'' levels).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+This talk is a side project intended for FSCD 2021 submission (in February).
+\vspace{1em}
+
+Other 2020 publications:
+\begin{itemize}
+  \item LICS 2020, with Ambrus: ``Large and Infinitary Quotient Inductive-Inductive Types''
+  \item ICFP 2020: ``Elaboration with First-Class Implicit Function Types''
+  \item TYPES 2019 post-proceedings, with Ambrus and Ambroise Lafont: ``For
+    Finitary Induction-Induction, Induction is Enough''
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+
+\begin{center} {\large Thank you!} \end{center}
+
+\end{frame}
+
+
+%% \begin{frame}[allowframebreaks]{References}
+%%   \bibliography{references}
+%% \end{frame}
+
+\end{document}

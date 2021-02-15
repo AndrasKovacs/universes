@@ -1,0 +1,23 @@
+\frametitle{Design choices and variations}
+
+\textbf{How many universes?} Agda/Coq: countably many.
+\vspace{1em}
+
+\textbf{Are universes totally ordered?} Agda/Coq: yes.
+\vspace{1em}
+
+\textbf{What kind of level polymorphism?}. Coq: bounded polymorphism. Agda: no
+bounds allowed. Bounded example:
+\begin{verbatim}
+  myId : (l : Level) → l < 3 → (A : Set l) → A → A
+  myId l p A x = x
+\end{verbatim}
+
+\textbf{What kind of operations are available on levels?} Agda is more liberal than Coq. Example:
+\begin{verbatim}
+  ℕtoLevel : ℕ → Level
+\end{verbatim}
+
+
+\textbf{Are universes cumulative} Agda: no. Coq: yes. Cumulativity: whenever \texttt{A : Set i}, we also have \texttt{A : Set (i + 1)}.
+

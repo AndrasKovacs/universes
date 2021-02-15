@@ -1,17 +1,17 @@
 
-module Universes where
+module IR where
 
 open import Lib
 
--- well-founded semicategory
-record WfSemiCat : Set₁ where
+-- set with well-founded transitive relation
+record LvlStruct : Set₁ where
   infix 4 _<_
   infixr 5 _∘_
   field
     Lvl         : Set
     _<_         : Lvl → Lvl → Set
+    <-prop      : ∀ {i j}{p q : i < j} → p ≡ q
     _∘_         : ∀ {i j k} → j < k → i < j → i < k
-    ass         : ∀ {i j k l}{f : k < l}{g}{h : i < j} → f ∘ g ∘ h ≡ (f ∘ g) ∘ h
     instance wf : ∀ {i} → Acc _<_ i
 
   acyclic : ∀ {i} → i < i → ⊥
@@ -20,8 +20,8 @@ record WfSemiCat : Set₁ where
     go {i} (acc f) q = go (f i q) q
 
 
-module IR-Univ (lvl : WfSemiCat) where
-  open WfSemiCat lvl public
+module IR-Univ (lvl : LvlStruct) where
+  open LvlStruct lvl public
   open import Data.Nat hiding (_<_; _≤_)
 
   infix 4 _<'_
@@ -30,9 +30,10 @@ module IR-Univ (lvl : WfSemiCat) where
   EL : ∀ {i l} → UU {i} l → Set
 
   data UU {i} l where
-    U'    : ∀ {j} → j < i → UU l
-    ℕ'    : UU l
-    Π' Σ' : (a : UU l) → (EL a → UU l) → UU l
+    U'       : ∀ {j} → j < i → UU l
+    ℕ'       : UU l
+    Π' Σ' W' : (a : UU l) → (EL a → UU l) → UU l
+    Id'      : (a : UU l) → EL a → EL a → UU l
 
     -- used for internal levels
     Lvl'  : UU l
@@ -44,6 +45,8 @@ module IR-Univ (lvl : WfSemiCat) where
   EL (i <' j)     = i < j
   EL (Π' a b)     = ∀ x → EL (b x)
   EL (Σ' a b)     = ∃ λ x → EL (b x)
+  EL (Id' a t u)  = t ≡ u
+  EL (W' a b)     = W (EL a) (λ x → EL (b x))
 
   -- Interpreting levels & lifts
   --------------------------------------------------------------------------------
@@ -62,20 +65,24 @@ module IR-Univ (lvl : WfSemiCat) where
 
   ↑   : ∀ {i j} → i < j → U i → U j
   El↑ : ∀ {i j} p a → El (↑ {i}{j} p a) ≡ El a
-  ↑   p (U' q)   = U' (p ∘ q)
-  ↑   p ℕ'       = ℕ'
-  ↑   p Lvl'     = Lvl'
-  ↑   p (i <' j) = i <' j
-  ↑   p (Π' a b) = Π' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
-  ↑   p (Σ' a b) = Σ' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
+  ↑   p (U' q)      = U' (p ∘ q)
+  ↑   p ℕ'          = ℕ'
+  ↑   p Lvl'        = Lvl'
+  ↑   p (i <' j)    = i <' j
+  ↑   p (Π' a b)    = Π' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
+  ↑   p (Σ' a b)    = Σ' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
+  ↑   p (W' a b)    = W' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
+  ↑   p (Id' a t u) = Id' (↑ p a) (coe (El↑ p a ⁻¹) t) (coe (El↑ p a ⁻¹) u)
   El↑ p (U' q)   = U↓-compute {p = p ∘ q} ◾ U↓-compute {p = q} ⁻¹
   El↑ p ℕ'       = refl
   El↑ p Lvl'     = refl
   El↑ p (i <' j) = refl
   El↑ p (Π' a b) rewrite El↑ p a = (λ f → ∀ x → f x) & ext (El↑ p F.∘ b)
-  El↑ p (Σ' a b) rewrite El↑ p a = ∃ & ext (El↑ p F.∘ b)
+  El↑ p (Σ' a b) rewrite El↑ p a = Σ _ & ext (El↑ p F.∘ b)
+  El↑ p (W' a b) rewrite El↑ p a = W _ & ext (El↑ p F.∘ b)
+  El↑ p (Id' a t u) rewrite El↑ p a = refl
 
-  -- congruence helper
+  -- congruence helper (TODO: cleanup, change to ap2, ap3 etc)
   ΠΣ≡ : ∀ {i}{l : ∀ j → j < i → Set}
           (F' : (a : UU l) → (EL a → UU l) → UU l)
           {a₀ a₁ : UU l}(a₂ : a₀ ≡ a₁)
@@ -86,7 +93,7 @@ module IR-Univ (lvl : WfSemiCat) where
 
   -- functorial lifting
   ↑∘ : ∀ {i j k}(p : i < j)(q : j < k) a → ↑ q (↑ p a) ≡ ↑ (q ∘ p) a
-  ↑∘ p q (U' r)   = U' & ass
+  ↑∘ p q (U' r)   = U' & <-prop
   ↑∘ p q ℕ'       = refl
   ↑∘ p q Lvl'     = refl
   ↑∘ p q (i <' j) = refl
@@ -104,6 +111,18 @@ module IR-Univ (lvl : WfSemiCat) where
                   (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
                 ◾ (λ y → coe y x) & UIP
                 ◾ coe∘ (El↑ (q ∘ p) a) (EL & ↑∘ p q a) x ⁻¹))
+  ↑∘ p q (W' a b) =
+    ΠΣ≡ W' (↑∘ p q a)
+        (λ x → ↑∘ p q _
+             ◾ (λ x → ↑ (q ∘ p) (b x)) &
+                  (coe∘ (El↑ p a) (El↑ q (↑ p a)) x
+                ◾ (λ y → coe y x) & UIP
+                ◾ coe∘ (El↑ (q ∘ p) a) (EL & ↑∘ p q a) x ⁻¹))
+  ↑∘ p q (Id' a t u) rewrite
+      coe∘ (El↑ q (↑ p a) ⁻¹) (El↑ p a ⁻¹) t
+    | coe∘ (El↑ q (↑ p a) ⁻¹) (El↑ p a ⁻¹) u =
+    {!!}
+
 
   -- conveniences
   --------------------------------------------------------------------------------
@@ -121,11 +140,10 @@ module IR-Univ (lvl : WfSemiCat) where
   ↑U p a = ↑ p (coe U↓-compute a)
 
 
-  -- Example fragment of a model for Jon's TT
-  -- Many omitted parts are awful to formalize.
+  -- Example fragment of a model with generalized hierarchies
   --------------------------------------------------------------------------------
 
-  module JonTT where
+  module Model where
     Con : Set₁
     Con = Set
 
@@ -138,31 +156,41 @@ module IR-Univ (lvl : WfSemiCat) where
     Sub : Con → Con → Set
     Sub Γ Δ = Γ → Δ
 
-    lift : ∀ {Γ i j} → i < j → Ty Γ i → Ty Γ j
-    lift p A γ = ↑ p (A γ)
+    Lift : ∀ {Γ i j} → i < j → Ty Γ i → Ty Γ j
+    Lift p A γ = ↑ p (A γ)
 
     infixl 5 _[_]T
     _[_]T : ∀ {Γ Δ i} → Ty Δ i → Sub Γ Δ → Ty Γ i
     _[_]T A σ γ = A (σ γ)
 
-    lift[]T : ∀ {Γ Δ i j p σ A} → lift {Δ}{i}{j} p A [ σ ]T ≡ lift {Γ} p (A [ σ ]T)
+    lift[]T : ∀ {Γ Δ i j p σ A} → Lift {Δ}{i}{j} p A [ σ ]T ≡ Lift {Γ} p (A [ σ ]T)
     lift[]T = refl
-
-    Cumulative : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (lift {Γ}{i}{j} p A)
-    Cumulative {p = p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ p (A γ) ⁻¹
-
-    u : ∀ {Γ i j} → i < j → Ty Γ j
-    u p _ = U' p
-
-    Russell : ∀ {Γ i j p} → Tm Γ (u {Γ}{i}{j} p) ≡ Ty Γ i
-    Russell = (λ f → ∀ x → f x) & ext λ _ → U↓-compute
 
     infixl 4 _▶_
     _▶_ : (Γ : Con) → ∀ {i} → Ty Γ i → Con
     Γ ▶ A = Σ Γ λ γ → El (A γ)
 
-    ▶lift : ∀ {Γ i j A}{p : i < j} → (Γ ▶ A) ≡ (Γ ▶ lift p A)
-    ▶lift {Γ}{A = A}{p} = Σ Γ & ext λ γ → El↑ p (A γ) ⁻¹
+    Cumulative : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (Lift {Γ}{i}{j} p A)
+    Cumulative {p = p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ p (A γ) ⁻¹
+
+    CumulativeCon : ∀ {Γ i j A}{p : i < j} → (Γ ▶ A) ≡ (Γ ▶ Lift p A)
+    CumulativeCon {Γ}{A = A}{p} = Σ Γ & ext λ γ → El↑ p (A γ) ⁻¹
+
+    lift : ∀ {Γ i j}(p : i < j){A : Ty Γ i} → Tm Γ A → Tm Γ (Lift p A)
+    lift p {A} t = λ γ → coe (El↑ p (A γ) ⁻¹) (t γ)
+
+    lower : ∀ {Γ i j}(p : i < j){A : Ty Γ i} → Tm Γ (Lift p A) → Tm Γ A
+    lower p {A} t = λ γ → coe (El↑ p (A γ)) (t γ)
+    -- term lifting/lowering is definitionally the identity function in ETT
+
+    u : ∀ {Γ i j} → i < j → Ty Γ j
+    u p _ = U' p
+
+    u[] : ∀ {Γ Δ σ i j p} → u {Δ}{i}{j} p [ σ ]T ≡ u {Γ}{i}{j} p
+    u[] = refl
+
+    RussellU : ∀ {Γ i j p} → Tm Γ (u {Γ}{i}{j} p) ≡ Ty Γ i
+    RussellU = (λ f → ∀ x → f x) & ext λ _ → U↓-compute
 
     Π : ∀ {Γ i}(A : Ty Γ i) → Ty (Γ ▶ A) i → Ty Γ i
     Π {Γ}{i} A B γ = Π' (A γ) λ α → B (γ , α)
@@ -173,16 +201,38 @@ module IR-Univ (lvl : WfSemiCat) where
     app : ∀ {Γ i A B} → Tm Γ {i} (Π A B) → Tm (Γ ▶ A) B
     app t (γ , α) = t γ α
 
+    -- note: type/term constructors in the model don't depend on levels at all, so lifting always preserves them.
+    Nat : ∀ {Γ} i → Ty Γ i
+    Nat i _ = ℕ'
 
-  -- Internalized levels
+    LiftNat : ∀ {Γ i j p} → Lift {Γ}{i}{j} p (Nat i) ≡ Nat j
+    LiftNat = refl
+
+    Zero : ∀ {Γ i} → Tm Γ (Nat i)
+    Zero _ = zero
+
+    Suc : ∀ {Γ i} → Tm Γ (Nat i) → Tm Γ (Nat i)
+    Suc t γ = suc (t γ)
+
+    ↑Zero : ∀ {Γ i j p} → lift {Γ}{i}{j} p {Nat i} (Zero {Γ}{i}) ≡ (Zero {Γ}{j})
+    ↑Zero = refl
+
+    ↑Suc : ∀ {Γ i j p t} → lift {Γ}{i}{j} p {Nat i} (Suc {Γ}{i} t) ≡ Suc {Γ}{j} (lift {Γ}{i}{j} p {Nat i} t)
+    ↑Suc = refl
+
+
+  -- Model of TT with internalized levels (fragment)
   --------------------------------------------------------------------------------
 
-  module InternalLevelTT where
+  module InternalLevelTT (l₀ : Lvl) (l₁ : Lvl) (l₀₁ : l₀ < l₁) where
 
+    -- Base CwF
     Con : Set₁
     Con = Set
 
-    -- levels in context
+    Sub : Con → Con → Set
+    Sub Γ Δ = Γ → Δ
+
     Level : Con → Set
     Level Γ = Γ → Lvl
 
@@ -192,47 +242,68 @@ module IR-Univ (lvl : WfSemiCat) where
     Tm : (Γ : Con) → ∀ {i} → Ty Γ i → Set
     Tm Γ {i} A = (γ : Γ) → El (A γ)
 
-    Level' : ∀ {Γ i} → Ty Γ i
-    Level' {Γ}{i} γ = Lvl'
+    ∙ : Con
+    ∙ = ⊤
 
-    -- "Russell-style" levels
-    RussellLevel : ∀ {Γ i} → Tm Γ (Level' {Γ}{i}) ≡ Level Γ
-    RussellLevel = refl
+    _▶_ : ∀(Γ : Con){i} → Ty Γ i → Con
+    Γ ▶ A = Σ Γ (El F.∘ A)
 
-    Lt : ∀ {Γ i} → Level Γ → Level Γ → Ty Γ i
+    -- type formers
+    --------------------------------------------------------------------------------
+
+    Id : ∀ {Γ i} A → Tm Γ {i} A → Tm Γ A → Ty Γ i
+    Id A t u γ = Id' (A γ) (t γ) (u γ)
+
+
+
+
+    -- level structure
+    --------------------------------------------------------------------------------
+    LvlTy : ∀ {Γ i} → Ty Γ i
+    LvlTy {Γ}{i} γ = Lvl'
+
+    Lt : ∀ {Γ i} → Tm Γ {i} LvlTy → Tm Γ {i} LvlTy → Ty Γ i
     Lt i j γ = i γ <' j γ
 
-    Comp : ∀ {Γ l i j k} → Tm Γ {l} (Lt i j) → Tm Γ {l} (Lt j k) → Tm Γ {l} (Lt i k)
-    Comp t u γ = u γ ∘ t γ
+    Compose : ∀ {Γ l i j k} → Tm Γ {l} (Lt j k) → Tm Γ {l} (Lt i j) → Tm Γ {l} (Lt i k)
+    Compose t u γ = t γ ∘ u γ
 
-    lift : ∀ {Γ}{i j : Level Γ} → Tm Γ {j} (Lt i j) → Ty Γ i → Ty Γ j
-    lift {i = i}{j} p A γ = ↑ (p γ) (A γ)
+    Lt-prop : ∀ {Γ i j k}(t u : Tm Γ {k} (Lt i j)) → Tm Γ {k} (Id (Lt i j) t u)
+    Lt-prop t u γ = <-prop
 
-    Cumulative : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (lift {Γ}{i}{j} p A)
-    Cumulative {Γ}{i}{j}{p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ (p γ) (A γ) ⁻¹
+    RussellLvl : ∀ {Γ i} → Tm Γ (LvlTy {Γ}{i}) ≡ Level Γ
+    RussellLvl = refl
 
-    u : ∀ {Γ i j} → Tm Γ {j} (Lt i j) → Ty Γ j
-    u p γ = U' (p γ)
+    Univ : ∀ {Γ i j} → Tm Γ {j} (Lt i j) → Ty Γ j
+    Univ p γ = U' (p γ)
 
-    RussellUniv : ∀ {Γ i j p} → Tm Γ (u {Γ}{i}{j} p) ≡ Ty Γ i
+    RussellUniv : ∀ {Γ i j p} → Tm Γ (Univ {Γ}{i}{j} p) ≡ Ty Γ i
     RussellUniv = (λ f → ∀ x → f x) & ext λ γ → U↓-compute
 
+    Lift : ∀ {Γ}{i j : Level Γ} → Tm Γ {j} (Lt i j) → Ty Γ i → Ty Γ j
+    Lift {i = i}{j} p A γ = ↑ (p γ) (A γ)
+
+    CumulativeTm : ∀ {Γ i j p A} → Tm Γ A ≡ Tm Γ (Lift {Γ}{i}{j} p A)
+    CumulativeTm {Γ}{i}{j}{p}{A} = (λ f → ∀ x → f x) & ext λ γ → El↑ (p γ) (A γ) ⁻¹
+
+    CumulativeCon : ∀ {Γ i j p A} → (Γ ▶ A) ≡ (Γ ▶ Lift {Γ}{i}{j} p A)
+    CumulativeCon {Γ} {i} {j} {p} {A} = Σ Γ & ext λ γ → El↑ (p γ) (A γ) ⁻¹
 
 
--- Additional assumption:
--- proof-irrelevant, strict total ordering for levels.
--- This is a realistic assumption for notions of TT models and for type checking.
+
+
+
+-- Additional assumption: levels bounded by ordinals
 --------------------------------------------------------------------------------
 
 pattern inj₂₁ x  = inj₂ (inj₁ x)
 pattern inj₂₂ x  = inj₂ (inj₂ x)
 
--- Corresponds to classical ordinal in HoTT book 10.4 without extensionality
-record Ordinal (lvl : WfSemiCat) : Set where
-  open WfSemiCat lvl
+-- Corresponds to type-theoretic ordinal in HoTT book 10.4
+record Ordinal (lvl : LvlStruct) : Set where
+  open LvlStruct lvl
   field
     cmp    : ∀ i j → i < j ⊎ j < i ⊎ i ≡ j
-    <-prop : ∀ {i j}{p q : i < j} → p ≡ q
     <-ext  : ∀ {i j} → (∀ k → (k < i → k < j) × (k < j → k < i)) → i ≡ j
 
   _≤_ : Lvl → Lvl → Set; infix 4 _≤_
@@ -282,7 +353,6 @@ module IR-Univ-Ordinal {lvl} (ord : Ordinal lvl) where
   El↑≤ (inj₂ refl) a = refl
 
   -- example: alternative type formation with _⊔_
-  -- We might need this for models of TTs.
   Π'' : ∀ {i j}(a : U i) → (El a → U j) → U (i ⊔ j)
   Π'' {i}{j} a b = Π' (↑≤ (⊔₁ i j) a) λ x → ↑≤ (⊔₂ i j) (b (coe (El↑≤ (⊔₁ i j) a) x))
 
@@ -296,13 +366,13 @@ module ℕ-example where
   open import Data.Nat.Properties
   open import Data.Nat.Induction
 
-  lvl : WfSemiCat
+  lvl : LvlStruct
   lvl = record {
       Lvl = ℕ
     ; _<_ = _<_
+    ; <-prop = <-irrelevant _ _
     ; _∘_ = λ p q → <-trans q p
     ; wf  = <-wellFounded _
-    ; ass = <-irrelevant _ _
     }
 
   open IR-Univ lvl hiding (_<_)
@@ -338,13 +408,13 @@ module ℕ*ℕ-example where
   <-irr (right p) (right q) = right & <-irrelevant _ _
 
   --  representation: (i, j) ~ (ω*i + j)
-  lvl : WfSemiCat
+  lvl : LvlStruct
   lvl = record {
       Lvl = N.ℕ × N.ℕ
     ; _<_ = _<_
+    ; <-prop = <-irr _ _
     ; _∘_ = trs
     ; wf  = wellFounded <-wellFounded <-wellFounded _
-    ; ass = <-irr _ _
     }
 
   open IR-Univ lvl hiding (_<_)
