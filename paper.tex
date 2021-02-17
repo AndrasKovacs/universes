@@ -130,6 +130,8 @@ co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optio
 \newcommand{\Acc}{\mathsf{Acc}}
 \newcommand{\acc}{\mathsf{acc}}
 \newcommand{\Lvl}{\mathsf{Lvl}}
+\renewcommand{\U}{\mathsf{U}}
+\newcommand{\Code}{\mathsf{Code}}
 
 
 %% --------------------------------------------------------------------------------
@@ -336,6 +338,10 @@ we may close a family over function types by assuming $\Pi : (A : \Ty\,\Gamma)
 $\beta\eta$-rules, and equations for the action of substitution on type and term
 formers.
 
+In the following, whenever we introduce a type former, we always assume that it
+is natural with respect to substitution, i.e.\ all type and term formers have a
+corresponding substitution rule.
+
 \subsection{Morphisms, Liftings and Inclusions of Families}
 \label{sec:morphisms}
 
@@ -344,7 +350,7 @@ multiple family structures, which serves as basis for specifying universe
 hierarchies. However, it is not very useful to simply have multiple copies of
 family structures together with their type formers. In that case, every
 constructor and eliminator of every type former stays in the same family, and
-there is no interaction between families, the most we can do is to mix them
+there is no interaction between families, and the most we can do is to mix them
 together in typing contexts. In this subsection we describe several ways of
 crossing between families.
 
@@ -377,7 +383,7 @@ on terms, and $\down$ for the inverse action on terms.
 \todo{Mention dependent right adjoints}
 
 \paragraph{Two-level type theory}
-Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$), and a
+Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$) and a
 lifting between them. This corresponds to a basic version of \emph{two-level
   type theory} \cite{twolevel}. This theory can be interpreted as having ($\Ty_1$,
 $\Tm_1$) as a metaprogramming layer which can generate object-level programs in
@@ -412,9 +418,10 @@ on ``sizing'' hierarchies instead of staging hierarchies. This means that we
 want to eliminate from any family to any other family which is ``connected'' by
 a morphism.
 
-\begin{mydefinition} A \emph{family inclusion} is a lifting which preserves all type
-and term formers. This assumes that every type former which is contained in the source family,
-is also contained in the target family.
+\begin{mydefinition}\label{def:inclusion}
+A \emph{family inclusion} is a lifting which preserves all type and term
+formers. This assumes that every type former which is contained in the source
+family, is also contained in the target family.
 \end{mydefinition}
 
 \noindent Some examples for preservation equations for type and term formers:
@@ -443,18 +450,12 @@ family, with the same elimination rules.
 
 \begin{mydefinition}\label{def:strict_inclusion}
 A \emph{strict family inclusion} between ($\Tm_0$, $\Ty_0$) and ($\Tm_1$,
-$\Ty_1$) is a family inclusion for which the following equations hold:
+$\Ty_1$) is a family inclusion ($\Lift$, $\up$, $\down$) for which the following equations hold:
 \begin{alignat}{2}
   & (\Gamma \ext \Lift\,A) &&= (\Gamma \ext A)     \label{eq:cumcon}    \\
   & \Tm_1\,\Gamma\,(\Lift\,A) &&= \Tm_0\,\Gamma\,A  \label{eq:cumtm}     \\
   & \up\!t &&= t                                    \label{eq:cumlift}
 \end{alignat}
-
-%% \begin{enumerate}
-%% \item $(\Gamma \ext \Lift\,A) = (\Gamma \ext A)$
-%% \item $\Tm_1\,\Gamma\,(\Lift\,A) = \Tm_0\,\Gamma\,A$
-%% \item $\up\!t = t$
-%% \end{enumerate}
 \end{mydefinition}
 
 A strict inclusion corresponds to Sterling's \emph{algebraic cumulativity}
@@ -471,11 +472,11 @@ is fine whenever the family is clear from context.
 The definitional equality of $\true_0$ and $\true_1$ is important; without it
 canonicity would fail, since $\true_0$, $\false_0$, $\true_1$ and $\false_1$
 would be four definitionally distinct inhabitants of $\Bool_1$. See Luo
-\cite{luo2012notes} on related issues with cumulativity. This means that it is
+\cite{luo2012notes} for a discussion of related issues with cumulativity. It is
 not sufficient to specify a strict inclusion just by equations \ref{eq:cumcon}
-and \ref{eq:cumtm} in Definition \ref{def:strict_inclusion}, we need $\up$ together
-with equation \ref{eq:cumlift} to identify term formers in different families. The
-other direction $\down\!t = t$ is immediately derivable.
+and \ref{eq:cumtm} in Definition \ref{def:strict_inclusion}, we need $\up$
+together with equation \ref{eq:cumlift} to identify term formers in different
+families. The other direction $\down\!t = t$ is immediately derivable.
 
 \subsection{Level Structures}
 \label{sec:level_structures}
@@ -496,12 +497,19 @@ inductive rules:
 descending $R$-chains must be finite. This is ensured by the universal property
 of the inductive definition, as all inductive types must be well-founded.
 
-\begin{mylemma} Accessibility is a mere proposition, i.e.\ all inhabitants of $\Acc\,R\,a$ are propositionally equal; see
-  \cite[Section 10.3]{hottbook}.
+\begin{mylemma}
+Accessibility is a mere proposition, i.e.\ all inhabitants of $\Acc\,R\,a$ are
+propositionally equal \cite[Lemma 10.3.4]{hottbook}.
 \end{mylemma}
 
-\begin{mydefinition} A relation $R : A \to A \to \Seti$ is \emph{well-founded} if $(a : A) \to \Acc\,R\,a$.
+\begin{mydefinition}
+A relation $R : A \to A \to \Seti$ is \emph{well-founded} if $(a : A) \to
+\Acc\,R\,a$.
 \end{mydefinition}
+
+\begin{mylemma}
+Every well-founded relation is irreflexive \cite[Lemma 10.4.2]{hottbook}.
+\end{mylemma}
 
 \begin{mydefinition} A \emph{level structure} consists of the following components:
 \begin{alignat*}{3}
@@ -519,11 +527,12 @@ well-founded relation.
 
 \begin{mydefinition}
 A \emph{family diagram} over $\Lvl$ maps each $i : \Lvl$ to a family structure
-($\Ty_i$, $\Tm_i$), and each $p : i < j$ to a strict inclusion
+($\Ty_i$, $\Tm_i$), and each $p : i < j$ to a family inclusion
 ($\Lift_{i}^{j}\,p$, $\up_{i}^{j}p$, $\down_{i}^{j}p$) between ($\Ty_i$,
 $\Tm_i$) and ($\Ty_j$, $\Tm_j$). Moreover, the mapping is functorial, so
 $\Lift_{i}^{k}\,(p\circ q)\,A = \Lift_{j}^{k}\,p\,(\Lift_{i}^{j}\,q\,A)$, and
-similarly for $\up_{i}^{j}p$ and $\down_{i}^{j}p$.
+similarly for $\up_{i}^{j}p$ and $\down_{i}^{j}p$. A \emph{strict family diagram}
+is a family diagram where each inclusion is strict.
 \end{mydefinition}
 
 \begin{notation}
@@ -539,32 +548,89 @@ liftings gives rise to isomorphic types. Concretely, given $p : i < j$ and $q :
 i < j$ such that $p \neq q$, we have $\Tm_j\,\Gamma\,(\Lift\,p\,A) \simeq
 \Tm_i\,\Gamma\,A \simeq \Tm_j\,\Gamma\,(\Lift\,q\,A)$, and since $\Lift\,p\,A$
 and $\Lift\,q\,A$ are in the same family, we can internally prove them
-isomorphic using function types and identity types.
-
-
-
-
-%% \begin{notation}
-%% Given $p : i < j$ we may write $\Lift_{i}^{j}\,p : \Ty_i\,\Gamma \to
-%% \Ty_j\,\Gamma$ for type lifting, and $\up_{i}^{j}p$ and $\down_{i}^{j}p$
-%% accordingly for term lifting. Sometimes we omit $i$, $j$ and $p$ annotations,
-%% when there is no ambiguity.
-%% \end{notation}
-
-
-%% \end{definition}
-
-
+isomorphic using function types and identity types. That said, every construction
+in this paper would still work with inverse categories as level structures.
 
 \subsection{Universes}
 \label{sec:universes}
 
-Coquand, Russell, naturality, large elimination examples
-Lifting of universes
-No lifting naturality for (El,Code)!
+At this point, we can talk about family diagrams, but no previously seen type
+former depends on levels in an interesting way. For example, $\Bool_i$ has the
+same canonical inhabitants as $\Bool_j$, for any $i$ and $j$. Universes
+introduce dependency on levels, by serving as classifiers for smaller families internally
+to larger families.
+
+\todo{find reference for Coquand univ}
+
+\begin{mydefinition} A family diagram supports \emph{universe formation} if it supports the following:
+\begin{alignat*}{3}
+  & \U             &&: (i\,j : \Lvl) \to i < j \to \Ty_j\,\Gamma\\
+  & \mathsf{LiftU} &&: \Lift_{j}^{k}\,p\,(\U\,i\,j\,q) = \U\,i\,k\,(p \circ q)
+\end{alignat*}
+\end{mydefinition}
+We also need a way to pin down universes as classifiers. We consider two variants.
+\begin{mydefinition}
+A family diagram has \emph{Coquand universes} if it has universe formation and
+additionally supports $\El : \Tm_j\,\Gamma\,(\U\,i\,j\,p) \to \Ty_i\,\Gamma$, and
+its inverse $\Code : \Ty_i\,\Gamma \to \Tm_j\,\Gamma\,(\U\,i\,j\,p)$.
+\end{mydefinition}
+\begin{mydefinition}
+A family diagram has \emph{Russell universes} if it has Coquand universes and
+additionally satisfies $\Tm_j\,\Gamma\,(\U\,i\,j\,p) = \Ty_i\,\Gamma$ and
+$\El\,t = t$.
+\end{mydefinition}
+
+The move from Coquand to Russell universes is fairly similar to the move from
+inclusions to strict inclusions. The Russell variant makes it possible to
+informally omit $\El$ and $\Code$. Likewise, the $\El\,t = t$ condition ensures
+appropriate naturality. If we only assumed $\Tm_j\,\Gamma\,(\U\,i\,j\,p) =
+\Ty_i\,\Gamma$ but not Coquand universes, we would not be able to prove that a
+$t : \Tm_j\,\Gamma\,(\U\,i\,j\,p)$ substituted \emph{as a term} is the same
+thing as $t$ substituted \emph{as a type}. Both would be written as $t[\sigma]$
+in our notation, but they involve different $\blank[\blank]$ operations.
+
+Unlike every other type or term former, there is no lifting computation rule for
+$\El$ and $\Code$. Intuitively, the issue is that we would need to relate type
+lifting and term lifting, but while term lifting has invertible action, type
+lifting does not. $\Lift$ sends a $\Ty_i\,\Gamma$ to a $\Ty_j\,\Gamma$, and a
+larger $\Ty$ is not isomorphic a smaller one, because it contains more
+universes. So, for example, lifting $\Bool_0 : \Ty_0\,\Gamma$ as a type to
+$\Ty_1\,\Gamma$ yields $\Bool_1$, but lifting $\Bool_0$ as a term yields
+$\Bool_0$.
+
+Assuming Coquand or Russell universes and $p : i < j$, we can recover
+polymorphic functions, for example, we may have $\mi{id} : \Pi(A : \U\,i\,j\,p)
+(\Lift\,p\,(\El\,A) \to \Lift\,p\,(\El\,A))$ for the polymorphic identity. Here,
+we quantify over terms of $\U$, and since every type former stays on the same
+level (including $\Pi$), we have to $\Lift$ the types in the codomain to the
+level of the domain. We can also recover large elimination, for example as in
+\[
+(\lambda\,(b : \Bool_j).\,\mathsf{if}\,b\,\mathsf{then}\,\Code\,\top_i\,\mathsf{else}\,\Code\,\bot_i)
+: \Tm_j\,\Gamma\,(\Bool_j \to \U\,i\,j\,p).
+\]
 
 \section{Semantics}
 \label{sec:semantics}
+
+In this section we give a model for a type theory with generalized
+universes. Let's make the notion of model concrete first.
+
+\begin{mydefinition} Fix a $\Lvl$ structure. A model for a type theory with $\Lvl$-indexed
+universes consists of the following:
+\begin{enumerate}
+  \item A base category ($\Con$, $\Sub$) with a terminal object $\emptycon$.
+  \item A strict family diagram ($\Ty_i$, $\Tm_i$) over $\Lvl$, supporting Russell
+        universes, and each family structure is closed under the same basic type formers.
+\end{enumerate}
+\end{mydefinition}
+
+We abbreviate the theory as TTGU, for ``type theory with generalized
+universes''. The choice of available basic type formers is up to personal taste,
+and it will not significantly affect the following model construction.
+
+
+
+
 
 \subsection{Inductive-Recursive Codes}
 \label{sec:inductive_recursive_codes}
