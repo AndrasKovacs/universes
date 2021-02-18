@@ -58,13 +58,13 @@ module IR-Univ (lvl : LvlStruct) where
   --------------------------------------------------------------------------------
 
   U↓ : ∀ {i} {{_ : Acc _<_ i}} j → j < i → Set
-  U↓ {i} {{acc f}} j p = UU {j} (U↓ {{f j p}})
+  U↓ {i} {{acc f}} j p = UU {j} (U↓ {j}{{f j p}})
 
   U : Lvl → Set
-  U i = UU (U↓ {i})
+  U i = UU {i} (U↓ {i} {{wf}})
 
   El : ∀ {i} → U i → Set
-  El = EL
+  El {i} = EL {i}{U↓ {i}{{wf}}}
 
   U↓-compute : ∀ {i a j p} → U↓ {i}{{a}} j p ≡ U j
   U↓-compute {i} {acc f} {j} {p} = (λ a → UU (U↓ {{a}})) & Acc-prop (f j p) wf
@@ -82,7 +82,7 @@ module IR-Univ (lvl : LvlStruct) where
   ↑   p (Σ' a b)    = Σ' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
   ↑   p (W' a b)    = W' (↑ p a) λ x → ↑ p (b (coe (El↑ p a) x))
   ↑   p (Id' a t u) = Id' (↑ p a) (coe (El↑ p a ⁻¹) t) (coe (El↑ p a ⁻¹) u)
-  El↑ p (U' q)   = U↓-compute {p = p ∘ q} ◾ U↓-compute {p = q} ⁻¹
+  El↑ {i}{j} p (U' {k} q) = U↓-compute {p = p ∘ q} ◾ U↓-compute {p = q} ⁻¹
   El↑ p ℕ'       = refl
   El↑ p ⊤'       = refl
   El↑ p ⊥'       = refl

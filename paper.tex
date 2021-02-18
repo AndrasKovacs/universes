@@ -132,6 +132,10 @@ co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optio
 \newcommand{\Lvl}{\mathsf{Lvl}}
 \renewcommand{\U}{\mathsf{U}}
 \newcommand{\Code}{\mathsf{Code}}
+\newcommand{\msf}[1]{\mathsf{#1}}
+\newcommand{\uir}{\msf{U^{IR}}}
+\newcommand{\elir}{\msf{El^{IR}}}
+\newcommand{\ult}{\U_{<}}
 
 
 %% --------------------------------------------------------------------------------
@@ -199,13 +203,12 @@ systems in this paper.
   stratification features, from two-level type theory to cumulative universes.
 \item We use induction-recursion to model the mentioned theories. We model
   the strongest formulations for lifting and universes, namely cumulative
-  universes with Russell-style type decoding. The main challenge is combining
-  transfinite hierarchies with strictly type-preserving lifting operations.
+  universes with Russell-style type decoding.
 \item In Section \ref{sec:ttfl} we describe type theories with internal types
   for levels and level morphisms, and extend the previous inductive-recursive
   semantics to cover these as well. Here, we can additionally represent various
   universe polymorphism features and level computations. We illustrate how
-  predicative universe features in Coq and Agda could be justified in our framework.
+  predicative universe features in Coq and Agda can be justified in our framework.
 \end{enumerate}
 
 \noindent Several related topics are not handled in this paper.
@@ -258,7 +261,7 @@ We work in a Martin-Löf type theory which has the following features.
     altogether if it is clear where certain variables are quantified.
 \end{itemize}
 
-\section{Type Theories with Generalized Universe Hierarchies}
+\section{Generalized Universe Hierarchies}
 \label{sec:ttgu}
 
 In this section, we first describe notions of models for type theories with
@@ -493,13 +496,13 @@ inductive rules:
 \end{alignat*}
 \end{mydefinition}
 
-\noindent An inhabitant of $\Acc\,R\,a$ proves that starting from $a : A$ all
+\noindent An inhabitant of $\Acc\,R\,a$ proves that starting from $a : A$, all
 descending $R$-chains must be finite. This is ensured by the universal property
 of the inductive definition, as all inductive types must be well-founded.
 
-\begin{mylemma}
+\begin{mylemma}\label{lem:accprop}
 Accessibility is a mere proposition, i.e.\ all inhabitants of $\Acc\,R\,a$ are
-propositionally equal \cite[Lemma 10.3.4]{hottbook}.
+equal \cite[Lemma 10.3.4]{hottbook}.
 \end{mylemma}
 
 \begin{mydefinition}
@@ -591,23 +594,25 @@ in our notation, but they involve different $\blank[\blank]$ operations.
 
 Unlike every other type or term former, there is no lifting computation rule for
 $\El$ and $\Code$. Intuitively, the issue is that we would need to relate type
-lifting and term lifting, but while term lifting has invertible action, type
-lifting does not. $\Lift$ sends a $\Ty_i\,\Gamma$ to a $\Ty_j\,\Gamma$, and a
-larger $\Ty$ is not isomorphic a smaller one, because it contains more
-universes. So, for example, lifting $\Bool_0 : \Ty_0\,\Gamma$ as a type to
-$\Ty_1\,\Gamma$ yields $\Bool_1$, but lifting $\Bool_0$ as a term yields
-$\Bool_0$.
+lifting and term lifting, but while term lifting is invertible, type lifting is
+not. $\Lift$ sends a $\Ty_i\,\Gamma$ to a $\Ty_j\,\Gamma$, and a larger $\Ty$ is
+not isomorphic a smaller one, because it contains more universes. So, for
+example, lifting $\Bool_0 : \Ty_0\,\Gamma$ as a type to $\Ty_1\,\Gamma$ yields
+$\Bool_1$, but lifting $\Bool_0$ as a term yields $\Bool_0$.
 
 Assuming Coquand or Russell universes and $p : i < j$, we can recover
 polymorphic functions, for example, we may have $\mi{id} : \Pi(A : \U\,i\,j\,p)
-(\Lift\,p\,(\El\,A) \to \Lift\,p\,(\El\,A))$ for the polymorphic identity. Here,
-we quantify over terms of $\U$, and since every type former stays on the same
-level (including $\Pi$), we have to $\Lift$ the types in the codomain to the
-level of the domain. We can also recover large elimination, for example as in
+(\Lift\,p\,(\El\,A) \to \Lift\,p\,(\El\,A))$ for the polymorphic identity
+function. Here, we quantify over terms of $\U$, and since every type former
+stays on the same level (including $\Pi$), we have to $\Lift$ the types in the
+codomain to match the level of the domain. We can also recover large
+elimination, for example as in
 \[
 (\lambda\,(b : \Bool_j).\,\mathsf{if}\,b\,\mathsf{then}\,\Code\,\top_i\,\mathsf{else}\,\Code\,\bot_i)
 : \Tm_j\,\Gamma\,(\Bool_j \to \U\,i\,j\,p).
 \]
+
+\todo{ordinal indexed levels and lubs}
 
 \section{Semantics}
 \label{sec:semantics}
@@ -615,8 +620,8 @@ level of the domain. We can also recover large elimination, for example as in
 In this section we give a model for a type theory with generalized
 universes. Let's make the notion of model concrete first.
 
-\begin{mydefinition} Fix a $\Lvl$ structure. A model for a type theory with $\Lvl$-indexed
-universes consists of the following:
+\begin{mydefinition}[Notion of model for a type theory with generalized universes (TTGU)]
+Fix a $\Lvl$ structure. A model for TTGU consists of
 \begin{enumerate}
   \item A base category ($\Con$, $\Sub$) with a terminal object $\emptycon$.
   \item A strict family diagram ($\Ty_i$, $\Tm_i$) over $\Lvl$, supporting Russell
@@ -624,24 +629,144 @@ universes consists of the following:
 \end{enumerate}
 \end{mydefinition}
 
-We abbreviate the theory as TTGU, for ``type theory with generalized
-universes''. The choice of available basic type formers is up to personal taste,
-and it will not significantly affect the following model construction.
+The choice of available basic type formers is up to personal taste, and it will
+not significantly affect the following model construction.
 
-
-
-
+Both in families and universes we choose the stricter formulation, since if we
+give a model which proves the strict syntax consistent, we immediately get a model which
+proves the weak syntax consistent\footnote{We always get \emph{initial} and \emph{terminal}
+models automatically, because of the algebraic character of the theories in this paper. We
+also get a \emph{freely generated} strict model from a weak model, from the left adjoint
+of the functor which forgets the strictness equations. But none of these tricks can be used
+to automatically get a consistency proof.}.
 
 \subsection{Inductive-Recursive Codes}
 \label{sec:inductive_recursive_codes}
 
-IR codes, code lifting, properties,
+The task is to interpret the $\Lvl$-many universes of TTGU using a metatheoretic
+feature which is more compact and already well-studied. For this, we need to
+define a $\Lvl$-indexed type of type codes. Since $\Lvl$ and $\!\blank<\!\blank$
+can be arbitrary, we effectively need to define transfinite hierarchies of
+codes. We use an inductive-recursive (IR) \cite{dybjer99finite} definition, for
+the following reasons.
 
-\subsection{Model}
+First, IR is already supported in the proof assistant Agda, and it is very
+useful to be able to sketch out ideas in a machine-checked setting. It would be
+much harder to do the same when developing semantics in set theory.
 
-List a bunch of things in the model.
+Second, could we use weaker type-theoretic features, like super universes
+\cite{Palmgren98onuniverses} or Mahlo universes \cite{setzer00mahlo}? These are
+sufficient to model transfinite hierarchies. However, it is not clear how to
+additionally support \emph{recursive sub-universes}, which in our work corresponds to
+the type former preservation property of $\Lift$. Thus, we give a custom IR
+definition which corresponds more directly to TTGU structure.
 
-\section{Type Theories with First-Class Universe Levels}
+\begin{mydefinition}[IR codes]
+  Assume $i : \Lvl$ and $f : (j : \Lvl) \to j < i \to \Set0$. We define
+  $\uir$ and $\elir$ by simultaneous IR. For basic type formers, below we only
+  include codes for function types and Booleans; other type formers are
+  straightforward to add (and we do have more in our Agda formalization).
+\begin{alignat*}{5}
+  & \uir   &&: \Set0
+     && \rlap{$\elir : \uir \to \Set0$} \\
+  & \U'    &&: (j : \Lvl) \to j < i \to \uir
+     && \elir\,(\U'\,j\,p) &&= f\,j\,p \\
+  & \Pi'   &&: (A : \uir) \to (\elir\,A \to \uir) \to \uir \hspace{2em}
+     && \elir\,(\Pi'\,A\,B) &&= (a : \elir\,A) \to \elir\,(B\,a)\\
+  & \Bool' &&: \uir
+     && \elir\,\Bool'      &&= \Bool
+\end{alignat*}
+\end{mydefinition}
+
+\begin{notation}
+We may write $\uir_{i\,f}$ and $\elir_{i\,f}$ in order to make parameters explicit.
+\end{notation}
+
+($\uir$, $\elir$) can be viewed as a \emph{universe operator}: given semantics
+for an initial segment of $\Lvl$ (given by $i$ and $f$), we create a new
+universe which is closed under basic type formers, and also closed under all
+sets in $f$ by the way of $\U'$. Most importantly, this operation can be
+transfinitely iterated. We first define universes for initial segments of
+$\Lvl$, by induction on the accessibility of levels:
+\begin{alignat*}{3}
+  & \ult\,: \{i : \Lvl\}\{p : \Acc\,<\,i\} \to (j : \Lvl) \to j < i \to \Set0 \\
+  & \ult\,\{j\}\,\{\acc\,f\}\,j\,p = \uir_{j\,(\ult\,\{j\}\,\{f\,j\,p\})}
+\end{alignat*}
+
+\begin{mydefinition}[Semantic universe]
+Since every level is accessible, we can define the full semantic hierarchy and
+its decoding function.
+\begin{alignat*}{3}
+  &\U : \Lvl \to \Set0
+     && \El : \{i : \Lvl\} \to \U\,i \to \Set0 \\
+  &\U\,i = \uir_{i\,(\ult\,\{i\}\,\{\mathsf{<\!wf}\,i\})}\hspace{1em}
+     && \El\,\{i\} = \elir_{i\,(\ult\,\{i\}\,\{\mathsf{<\!wf}\,i\})}
+\end{alignat*}
+\end{mydefinition}
+
+\begin{mylemma}\label{lem:ucomp}
+Assuming $p : i < j$, we have the computation rule $\ult\,j\,p = \U\,j$. Proof: we
+may assume that any witness for $\Acc\,<\,i$ is of the form $\acc\,f$ for
+some $f$. Then the equation becomes $\uir_{j\,(\ult\,\{j\}\,\{f\,j\,p\})} =
+\uir_{j\,(\ult\,\{j\}\,\{\mathsf{<\!wf}\,j\})}$, but by Lemma \ref{lem:accprop}
+the $f\,j\,p$ and $\mathsf{<\!wf}\,j$ witnesses are equal. \qed
+\end{mylemma}
+
+\begin{mydefinition}[Semantic $\Lift$]
+We define by induction on $\uir$ a function with type $(p : i < j)(A : \U\,i)
+\to (A' : \U\,j)\times(\El\,A' = \El\,A)$. However, for the sake of clarity, we
+present this here as two (mutual) functions:
+\begin{alignat*}{3}
+  &\Lift\,      &&: (p : i < j) \to \U\,i \to \U\,j\\
+  &\msf{ElLift} &&: (p : i < j)(A : \U\,i) \to \El\,(\Lift\,A) = \El\,A
+\end{alignat*}
+Let us look at $\Lift$ first:
+\begin{alignat*}{3}
+  &\Lift\,p\,(\U'\,k\,q)    &&= \U'\,k\,(p \circ q)\\
+  &\Lift\,p\,(\Pi'\,A\,B)   &&= \Pi'\,(\Lift\,p\,A)\,(\lambda\,a.\,\Lift\,p\,(B\,a))\\
+  &\Lift\,p\,\Bool'         &&= \Bool'
+\end{alignat*}
+Above, the $\Pi'$ definition is well-typed by $\msf{ElLift}\,p\,A$. For the
+proof of $\msf{ElLift}$, the only interesting case is $\U'$. Here, we need
+show $\ult\,\{j\}\,k\,(p \circ q) = \ult\,\{i\}\,k\,q$, but by Lemma
+\ref{lem:ucomp} both sides are $\U\,k$. \qed
+\end{mydefinition}
+
+\begin{mylemma} Properties of $\Lift$:
+\begin{enumerate}
+  \item $\Lift$ preserves all basic type formers; this is immediate from the definition.
+  \item $\Lift$ is functorial, i.e.\ $\Lift\,(p \circ q)\,A = \Lift\,p\,(\Lift\,q\,A)$. This follows
+    by induction on $A$, and we make use of the irrelevance of $\blank\!<\!\blank$ in the $\U'$ case.
+    \qed
+\end{enumerate}
+\end{mylemma}
+
+\subsection{Model of TTGU}
+
+We give a model of TTGU in this section.
+
+\todo{disambiguate IR and TTGU type notation}
+
+\begin{mydefinition}[Base category]
+This is simply the category of sets and functions in $\Set0$, i.e.\ $\Con = \Set0$,
+$\Sub\,\Gamma\,\Delta = \Gamma \to \Delta$, and the terminal object is $\top$.
+\end{mydefinition}
+
+\begin{mydefinition}[Family diagram]
+We map $i : \Lvl$ to a family structure as follows.
+\begin{alignat*}{5}
+  &\Ty_i\,\Gamma = \Gamma \to \U\,i \hspace{2em} \Tm_i\,\Gamma\,A = (\gamma : \Gamma) \to \El\,(A\,\gamma)
+\end{alignat*}
+Type and term substitution are given by composition with some $\sigma : \Gamma
+\to \Delta$ function. Context extension is given by $\Gamma \ext A = (\gamma :
+\Gamma) \times \El\,(A\,\gamma)$. Since we define $\blank\!\ext\!\blank$ as a
+$\Sigma$-type, the comprehension structure for it follows immediately, as
+$\Sigma$ pairing and projections.
+
+Mapping $i$ to a strict inclusion is defined as follows. We
+\end{mydefinition}
+
+\section{First-Class Universe Levels}
 \label{sec:ttfl}
 
 Specification of the theory
