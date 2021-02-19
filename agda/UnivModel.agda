@@ -72,12 +72,6 @@ module UnivModel (L : LvlStruct) where
   RussellUniv : ∀ {Γ i j p} → Tm Γ (Univ {Γ}{i}{j} p) ≡ Ty Γ i
   RussellUniv = (λ f → ∀ x → f x) & ext λ _ → U↓-compute
 
-  -- lem1 : ∀ {Γ i j k p q a} → lift {Γ}{j}{k} p {Univ {Γ}{i}{j} q} a ≡ coe (CumulativeTm {Γ}{i}{k}{p ∘ q}{{!!}}) a
-  --     lift a = a
-
-  -- Russell[] : (a : Tm Δ (Univ p)) → a [ σ ]T = a [ σ ]
-  --    a ∘ σ = a ∘ σ   OK
-
   Π : ∀ {Γ i}(A : Ty Γ i) → Ty (Γ ▶ A) i → Ty Γ i
   Π {Γ}{i} A B γ = Π' (A γ) λ α → B (γ , α)
 

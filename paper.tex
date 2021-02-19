@@ -80,6 +80,7 @@ co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optio
 \presetkeys{todonotes}{inline}{}
 \usepackage{scalerel}
 \usepackage{amssymb}
+\usepackage{bm}
 
 
 %% \theoremstyle{definition}
@@ -136,6 +137,7 @@ co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optio
 \newcommand{\uir}{\msf{U^{IR}}}
 \newcommand{\elir}{\msf{El^{IR}}}
 \newcommand{\ult}{\U_{<}}
+
 
 
 %% --------------------------------------------------------------------------------
@@ -732,7 +734,7 @@ show $\ult\,\{j\}\,k\,(p \circ q) = \ult\,\{i\}\,k\,q$, but by Lemma
 \ref{lem:ucomp} both sides are $\U\,k$. \qed
 \end{mydefinition}
 
-\begin{mylemma} Properties of $\Lift$:
+\begin{mylemma}\label{lem:liftprop} Properties of $\Lift$:
 \begin{enumerate}
   \item $\Lift$ preserves all basic type formers; this is immediate from the definition.
   \item $\Lift$ is functorial, i.e.\ $\Lift\,(p \circ q)\,A = \Lift\,p\,(\Lift\,q\,A)$. This follows
@@ -745,25 +747,83 @@ show $\ult\,\{j\}\,k\,(p \circ q) = \ult\,\{i\}\,k\,q$, but by Lemma
 
 We give a model of TTGU in this section.
 
-\todo{disambiguate IR and TTGU type notation}
+\begin{notation} To avoid name clashing between components of the model and metatheoretic
+definitions, we use \textbf{bold} font to refer to TTGU components.
+\end{notation}
 
 \begin{mydefinition}[Base category]
-This is simply the category of sets and functions in $\Set0$, i.e.\ $\Con = \Set0$,
-$\Sub\,\Gamma\,\Delta = \Gamma \to \Delta$, and the terminal object is $\top$.
+This is simply the category of sets and functions in $\Set0$, i.e.\ $\bm{\Con} = \Set0$,
+$\bm{\Sub}\,\Gamma\,\Delta = \Gamma \to \Delta$, and the terminal object is $\top$.
 \end{mydefinition}
 
 \begin{mydefinition}[Family diagram]
 We map $i : \Lvl$ to a family structure as follows.
 \begin{alignat*}{5}
-  &\Ty_i\,\Gamma = \Gamma \to \U\,i \hspace{2em} \Tm_i\,\Gamma\,A = (\gamma : \Gamma) \to \El\,(A\,\gamma)
+  &\bm{\Ty}_i\,\Gamma = \Gamma \to \U\,i \hspace{2em} \bm{\Tm}_i\,\Gamma\,A = (\gamma : \Gamma) \to \El\,(A\,\gamma)
 \end{alignat*}
 Type and term substitution are given by composition with some $\sigma : \Gamma
-\to \Delta$ function. Context extension is given by $\Gamma \ext A = (\gamma :
-\Gamma) \times \El\,(A\,\gamma)$. Since we define $\blank\!\ext\!\blank$ as a
-$\Sigma$-type, the comprehension structure for it follows immediately, as
-$\Sigma$ pairing and projections.
+\to \Delta$ function. Comprehension structure is given by $\Gamma \bm{\ext} A =
+(\gamma : \Gamma) \times \El\,(A\,\gamma)$. Type lifting along $p : i < j$ is
+as follows:n
+\begin{alignat*}{5}
+  & \bm{\Lift}_{i}^{j}p : \bm{\Ty}_i\,\Gamma \to \bm{\Ty}_j\,\Gamma\\
+  & \bm{\Lift}_{i}^{j}p\,A = \lambda\,\gamma.\,\Lift_{i}^{j}p\,(A\,\gamma)
+\end{alignat*}
+Now, two of the strict inclusion equations follow from $\msf{ElLift}$, namely
+$(\Gamma \bm{\ext} \bm{\Lift}_{i}^{j}p\,A) = (\Gamma \bm{\ext} A)$ and
+$\bm{\Tm}_j\,\Gamma\,(\bm{\Lift}_{i}^{j}p\,A) = \bm{\Tm}_i\,\Gamma\,A$. Thus, we
+can just define term lifting as $\bm{\up}_{i}^{j}\!p\,t = t$ and
+$\bm{\down}_{i}^{j}\!p\,t = t$. Basic type formers are as follows.
+\begin{alignat*}{5}
+  & \bm{\Pi}\,A\,B = \lambda\,\gamma.\,\Pi'\,(A\,\Gamma)\,(\lambda\,\alpha.\,B\,(\gamma,\,\alpha))
+  & \hspace{2em}\bm{\Bool} = \lambda\,\gamma.\,\Bool'
+\end{alignat*}
+$\bm{\Lift}_{i}^{j}p$ preserves type formers by Lemma \ref{lem:liftprop}. We
+define basic term formers using metatheoretic term formers, e.g.\ $\bm{\true}_i
+= \lambda\,\gamma.\,\true$ and $(\bm{\lambda}_i\,x.\,t) =
+\lambda\,\gamma\,\alpha.\,t\,(\gamma,\,\alpha)$. Note that since semantic term
+formers are just external constructors, they do not depend on levels, so
+e.g.\ $\bm{\true}_i$ is the same at all $i$. This implies that
+$\bm{\up}_{i}^{j}\!p$ preserves term formers as well, so ($\bm{\Lift}_{i}^{j}p$,
+$\bm{\up}_{i}^{j}\!p$, $\bm{\down}_{i}^{j}\!p$) is a strict family inclusion.
 
-Mapping $i$ to a strict inclusion is defined as follows. We
+We define universes as $\bm{\U}\,i\,j\,p = \lambda\,\gamma.\,\U'_i\,j\,p$.  With
+this, $\bm{\Lift}_{j}^{k}\,p\,(\bm{\U}\,i\,j\,q) = \bm{\U}\,i\,k\,(p \circ q)$
+follows by the definition of semantic $\Lift$. The Russell universe equation
+$\bm{\Tm}_j\,\Gamma\,(\bm{\U}\,i\,j\,p) = \bm{\Ty}_i\,\Gamma$ follows from Lemma
+\ref{lem:ucomp}, so we can define $\bm{\El}$ and $\bm{\Code}$ as identity functions.
+
+\begin{theorem}[Consistency of TTGU]
+There is no closed syntactic term of $\bot_i$ for any $i$.
+\end{theorem}
+\begin{proof}
+Assuming a syntactic $t : \Tm_i\,\emptycon\,\bot_i$, we can interpret it in the
+previously given model, which yields an inhabitant of the metatheoretic $\bot$,
+hence a contradiction.
+\end{proof}
+
+
+
+
+
+%% To verify that we have strict inclusions, we need to
+%% show that $\bm{\Lift}$ and $\bm{\up}$ preserve all type and term
+%% formers, but first we look at the semantics of type and term formers.
+
+%% To verify that we have strict inclusions, it
+%% remains to show that $\bm{\Lift}$ and $\bm{\up}$ preserve all type and term
+%% formers.  For $\bm{\Lift}$ this follows from Lemma \ref{lem:liftprop}. For
+%% $\bm{\up}$, note that semantics terms
+
+
+  %% & (\Gamma \ext \Lift\,A) &&= (\Gamma \ext A)     \label{eq:cumcon}    \\
+  %% & \Tm_1\,\Gamma\,(\Lift\,A) &&= \Tm_0\,\Gamma\,A  \label{eq:cumtm}     \\
+  %% & \up\!t &&= t                                    \label{eq:cumlift}
+
+%% The strict inclusions are given as follows.
+  %% Lift : ∀ {Γ i j} → i < j → Ty Γ i → Ty Γ j
+  %% Lift p A γ = ↑ p (A γ)
+
 \end{mydefinition}
 
 \section{First-Class Universe Levels}
