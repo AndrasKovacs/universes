@@ -137,6 +137,10 @@ co-financed by the European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).}%optio
 \newcommand{\uir}{\msf{U^{IR}}}
 \newcommand{\elir}{\msf{El^{IR}}}
 \newcommand{\ult}{\U_{<}}
+\newcommand{\mkMor}{\msf{mk}\!_<}
+\newcommand{\unMor}{\msf{un}\!_<}
+\newcommand{\mkLvl}{\msf{mk}_{\Lvl}}
+\newcommand{\unLvl}{\msf{un}_{\Lvl}}
 
 
 
@@ -209,8 +213,7 @@ systems in this paper.
 \item In Section \ref{sec:ttfl} we describe type theories with internal types
   for levels and level morphisms, and extend the previous inductive-recursive
   semantics to cover these as well. Here, we can additionally represent various
-  universe polymorphism features and level computations. We illustrate how
-  predicative universe features in Coq and Agda can be justified in our framework.
+  universe polymorphism features and level computations.
 \end{enumerate}
 
 \noindent Several related topics are not handled in this paper.
@@ -231,6 +234,11 @@ in homotopy type theory \cite{hottbook}, but we do not attempt to cover such use
 cases.
 \item
 We only cover predicative hierarchies.
+\item
+We do not discuss ergonomics and implementation of elaboration. Our goal is to
+develop a system which is as flexible as possible, even though that may not be
+the best suited for inference and elaboration. For example, first-class levels
+have undecidable ordering in general.
 \end{itemize}
 
 We provide an Agda formalization of the contents of the paper. The formalization
@@ -240,6 +248,8 @@ reflection), and instead focus on the key points.
 
 \section{Metatheory}
 \label{sec:metatheory}
+
+\todo{purge unused features}
 
 We work in a Martin-Löf type theory which has the following features.
 \begin{itemize}
@@ -614,8 +624,6 @@ elimination, for example as in
 : \Tm_j\,\Gamma\,(\Bool_j \to \U\,i\,j\,p).
 \]
 
-\todo{ordinal indexed levels and lubs}
-
 \section{Semantics}
 \label{sec:semantics}
 
@@ -664,10 +672,10 @@ the type former preservation property of $\Lift$. Thus, we give a custom IR
 definition which corresponds more directly to TTGU structure.
 
 \begin{mydefinition}[IR codes]
-  Assume $i : \Lvl$ and $f : (j : \Lvl) \to j < i \to \Set0$. We define
-  $\uir$ and $\elir$ by simultaneous IR. For basic type formers, below we only
-  include codes for function types and Booleans; other type formers are
-  straightforward to add (and we do have more in our Agda formalization).
+  Assume $i : \Lvl$ and $f : (j : \Lvl) \to j < i \to \Set0$. We define $\uir$
+  and $\elir$ by simultaneous IR. For basic type formers, below we only include
+  codes for function types, the empty type, and $\Bool$; other type formers are
+  straightforward to add (and we do have more in the Agda formalization).
 \begin{alignat*}{5}
   & \uir   &&: \Set0
      && \rlap{$\elir : \uir \to \Set0$} \\
@@ -675,8 +683,10 @@ definition which corresponds more directly to TTGU structure.
      && \elir\,(\U'\,j\,p) &&= f\,j\,p \\
   & \Pi'   &&: (A : \uir) \to (\elir\,A \to \uir) \to \uir \hspace{2em}
      && \elir\,(\Pi'\,A\,B) &&= (a : \elir\,A) \to \elir\,(B\,a)\\
+  & \bot' &&: \uir
+     && \elir\,\bot'      &&= \bot\\
   & \Bool' &&: \uir
-     && \elir\,\Bool'      &&= \Bool
+     && \elir\,\Bool'     &&= \Bool
 \end{alignat*}
 \end{mydefinition}
 
@@ -691,8 +701,8 @@ sets in $f$ by the way of $\U'$. Most importantly, this operation can be
 transfinitely iterated. We first define universes for initial segments of
 $\Lvl$, by induction on the accessibility of levels:
 \begin{alignat*}{3}
-  & \ult\,: \{i : \Lvl\}\{p : \Acc\,<\,i\} \to (j : \Lvl) \to j < i \to \Set0 \\
-  & \ult\,\{j\}\,\{\acc\,f\}\,j\,p = \uir_{j\,(\ult\,\{j\}\,\{f\,j\,p\})}
+  & \ult\,: (i : \Lvl)\{p : \Acc\,<\,i\} \to (j : \Lvl) \to j < i \to \Set0 \\
+  & \ult\,i\,\{\acc\,f\}\,j\,p = \uir_{j\,(\ult\,j\,\{f\,j\,p\})}
 \end{alignat*}
 
 \begin{mydefinition}[Semantic universe]
@@ -701,16 +711,16 @@ its decoding function.
 \begin{alignat*}{3}
   &\U : \Lvl \to \Set0
      && \El : \{i : \Lvl\} \to \U\,i \to \Set0 \\
-  &\U\,i = \uir_{i\,(\ult\,\{i\}\,\{\mathsf{<\!wf}\,i\})}\hspace{1em}
-     && \El\,\{i\} = \elir_{i\,(\ult\,\{i\}\,\{\mathsf{<\!wf}\,i\})}
+  &\U\,i = \uir_{i\,(\ult\,i\,\{\mathsf{<\!wf}\,i\})}\hspace{1em}
+     && \El\,\{i\} = \elir_{i\,(\ult\,i\,\{\mathsf{<\!wf}\,i\})}
 \end{alignat*}
 \end{mydefinition}
 
 \begin{mylemma}\label{lem:ucomp}
 Assuming $p : i < j$, we have the computation rule $\ult\,j\,p = \U\,j$. Proof: we
 may assume that any witness for $\Acc\,<\,i$ is of the form $\acc\,f$ for
-some $f$. Then the equation becomes $\uir_{j\,(\ult\,\{j\}\,\{f\,j\,p\})} =
-\uir_{j\,(\ult\,\{j\}\,\{\mathsf{<\!wf}\,j\})}$, but by Lemma \ref{lem:accprop}
+some $f$. Then the equation becomes $\uir_{j\,(\ult\,j\,\{f\,j\,p\})} =
+\uir_{j\,(\ult\,j\,\{\mathsf{<\!wf}\,j\})}$, but by Lemma \ref{lem:accprop}
 the $f\,j\,p$ and $\mathsf{<\!wf}\,j$ witnesses are equal. \qed
 \end{mylemma}
 
@@ -726,11 +736,12 @@ Let us look at $\Lift$ first:
 \begin{alignat*}{3}
   &\Lift\,p\,(\U'\,k\,q)    &&= \U'\,k\,(p \circ q)\\
   &\Lift\,p\,(\Pi'\,A\,B)   &&= \Pi'\,(\Lift\,p\,A)\,(\lambda\,a.\,\Lift\,p\,(B\,a))\\
+  &\Lift\,p\,\bot'          &&= \bot'\\
   &\Lift\,p\,\Bool'         &&= \Bool'
 \end{alignat*}
 Above, the $\Pi'$ definition is well-typed by $\msf{ElLift}\,p\,A$. For the
 proof of $\msf{ElLift}$, the only interesting case is $\U'$. Here, we need
-show $\ult\,\{j\}\,k\,(p \circ q) = \ult\,\{i\}\,k\,q$, but by Lemma
+show $\ult\,j\,k\,(p \circ q) = \ult\,i\,k\,q$, but by Lemma
 \ref{lem:ucomp} both sides are $\U\,k$. \qed
 \end{mydefinition}
 
@@ -743,7 +754,7 @@ show $\ult\,\{j\}\,k\,(p \circ q) = \ult\,\{i\}\,k\,q$, but by Lemma
 \end{enumerate}
 \end{mylemma}
 
-\subsection{Model of TTGU}
+\subsection{IR Model of TTGU}
 
 We give a model of TTGU in this section.
 
@@ -764,7 +775,7 @@ We map $i : \Lvl$ to a family structure as follows.
 Type and term substitution are given by composition with some $\sigma : \Gamma
 \to \Delta$ function. Comprehension structure is given by $\Gamma \bm{\ext} A =
 (\gamma : \Gamma) \times \El\,(A\,\gamma)$. Type lifting along $p : i < j$ is
-as follows:n
+as follows:
 \begin{alignat*}{5}
   & \bm{\Lift}_{i}^{j}p : \bm{\Ty}_i\,\Gamma \to \bm{\Ty}_j\,\Gamma\\
   & \bm{\Lift}_{i}^{j}p\,A = \lambda\,\gamma.\,\Lift_{i}^{j}p\,(A\,\gamma)
@@ -776,10 +787,11 @@ can just define term lifting as $\bm{\up}_{i}^{j}\!p\,t = t$ and
 $\bm{\down}_{i}^{j}\!p\,t = t$. Basic type formers are as follows.
 \begin{alignat*}{5}
   & \bm{\Pi}\,A\,B = \lambda\,\gamma.\,\Pi'\,(A\,\Gamma)\,(\lambda\,\alpha.\,B\,(\gamma,\,\alpha))
-  & \hspace{2em}\bm{\Bool} = \lambda\,\gamma.\,\Bool'
+  & \hspace{2em}\bm{\bot}_i = \lambda\,\gamma.\,\bot'
+  & \hspace{2em}\bm{\Bool}_i = \lambda\,\gamma.\,\Bool'
 \end{alignat*}
 $\bm{\Lift}_{i}^{j}p$ preserves type formers by Lemma \ref{lem:liftprop}. We
-define basic term formers using metatheoretic term formers, e.g.\ $\bm{\true}_i
+define basic term formers and eliminators using metatheoretic features, e.g.\ $\bm{\true}_i
 = \lambda\,\gamma.\,\true$ and $(\bm{\lambda}_i\,x.\,t) =
 \lambda\,\gamma\,\alpha.\,t\,(\gamma,\,\alpha)$. Note that since semantic term
 formers are just external constructors, they do not depend on levels, so
@@ -793,6 +805,8 @@ follows by the definition of semantic $\Lift$. The Russell universe equation
 $\bm{\Tm}_j\,\Gamma\,(\bm{\U}\,i\,j\,p) = \bm{\Ty}_i\,\Gamma$ follows from Lemma
 \ref{lem:ucomp}, so we can define $\bm{\El}$ and $\bm{\Code}$ as identity functions.
 
+\end{mydefinition}
+
 \begin{theorem}[Consistency of TTGU]
 There is no closed syntactic term of $\bot_i$ for any $i$.
 \end{theorem}
@@ -803,33 +817,247 @@ hence a contradiction.
 \end{proof}
 
 
-
-
-
-%% To verify that we have strict inclusions, we need to
-%% show that $\bm{\Lift}$ and $\bm{\up}$ preserve all type and term
-%% formers, but first we look at the semantics of type and term formers.
-
-%% To verify that we have strict inclusions, it
-%% remains to show that $\bm{\Lift}$ and $\bm{\up}$ preserve all type and term
-%% formers.  For $\bm{\Lift}$ this follows from Lemma \ref{lem:liftprop}. For
-%% $\bm{\up}$, note that semantics terms
-
-
-  %% & (\Gamma \ext \Lift\,A) &&= (\Gamma \ext A)     \label{eq:cumcon}    \\
-  %% & \Tm_1\,\Gamma\,(\Lift\,A) &&= \Tm_0\,\Gamma\,A  \label{eq:cumtm}     \\
-  %% & \up\!t &&= t                                    \label{eq:cumlift}
-
-%% The strict inclusions are given as follows.
-  %% Lift : ∀ {Γ i j} → i < j → Ty Γ i → Ty Γ j
-  %% Lift p A γ = ↑ p (A γ)
-
-\end{mydefinition}
-
 \section{First-Class Universe Levels}
 \label{sec:ttfl}
 
-Specification of the theory
+In the following, we specify and model type theories where levels and
+their morphisms are represented by internal types.
+
+However, it would be awkward to pick a particular structure for levels, and
+specify a type theory which internalizes that structure; for example
+internalizing levels as natural numbers. We do not want to repeat the
+specification and semantics for each choice of level structure; instead, we aim
+to have a more generic solution.
+\begin{enumerate}
+  \item We first give a specification of \emph{type theory with dependent
+        levels}, or TTDL, where levels and level morphism may depend on typing contexts.
+        Here, liftings, universes and type formers are specified, but the internal
+        structure of levels is not yet pinned down.
+  \item We show that we can extend TTDL with \emph{level reflection} rules, which identify
+        levels with particular internal types, thereby getting \emph{type theories with first-class
+        levels}, or TTFL.
+\end{enumerate}
+This decreases the amount of work that we have to do, in order to get semantics
+for different level setups. We only need to pick an external level structure
+such that it can be also represented using TTDL type formers.
+
+\begin{mydefinition} A model of TTDL consists of the following.
+\begin{enumerate}
+\item
+  A base category ($\Con$, $\Sub$) with terminal object $\emptycon$.
+\item
+  A ``dependent'' level structure on the base category:
+  \begin{alignat*}{3}
+    &\Lvl                  &&: \Con \to \Seti\\
+    &\blank\!<\!\blank     &&: \{\Gamma : \Con\} \to \Lvl\,\Gamma \to \Lvl\,\Gamma \to \Seti\\
+    &<\!\msf{prop}         &&: (p\,q : i < j) \to p = q\\
+    &\blank\!\circ\!\blank &&: j < k \to i < j \to i < k
+  \end{alignat*}
+  Additionally, $\Lvl$ and $\blank\!<\!\blank$ are natural in the base category,
+  so they support substitution operations. \emph{Remark:} at this point, we do not require well-foundedness
+  for $\blank\!<\!\blank$, as it has no bearing on basic lifting and universe rules, and
+  well-foundedness will be usually internally provable when we add level reflection rules.
+\item
+  A ``bootstrapping'' assumption on levels. This can be any collection of levels
+  and morphisms. We pick the assumption that $l_0, l_1 : \Lvl\,\Gamma$ exist
+  together with $l_{01} : l_0 < l_1$. We need to assume at least some levels,
+  because otherwise the TTDL syntax is trivial; it is not even possible to
+  write down a non-empty context or a closed type former. $l_0 < l_1$ allows large
+  eliminations on type formers so it provides a fair amount of expressive power.
+\item
+  A family structure:
+  \begin{alignat*}{3}
+    &\Ty &&: (\Gamma : \Con) \to \Lvl\,\Gamma \to \Seti\\
+    &\Tm &&: (\Gamma : \Con)\{i : \Lvl\,\Gamma\} \to \Ty\,\Gamma\,i \to \Seti\\
+    &\blank\ext\blank &&: (\Gamma : \Con)\{i : \Lvl\,\Gamma\} \to \Ty\,\Gamma\,i \to \Con
+  \end{alignat*}
+  We have type and term substitution, which depends on level substitution. For instance, we have
+  \[
+    \blank[\blank] : \Ty\,\Delta\,i \to (\sigma : \Sub\,\Gamma\,\Delta) \to \Ty\,\Gamma\,(i[\sigma])
+  \]
+  We also have a comprehension isomorphism $\Sub\,\Gamma\,(\Delta \ext A) \simeq
+  (\sigma : \Sub\,\Gamma\,\Delta)\times \Tm\,\Gamma\,(A[\sigma])$, which is
+  natural in $\Gamma$.
+\item A lifting structure with
+  \begin{alignat*}{3}
+    &\Lift &&: \{\Gamma : \Con\}\{i\,j : \Lvl\,\Gamma\} \to i < j \to \Ty\,\Gamma\,i \to \Ty\,\Gamma\,j\\
+    &\up   &&: \{\Gamma : \Con\}\{i\,j : \Lvl\,\Gamma\}(p : i < j) \to \Tm\,\Gamma\,A \to \Tm\,\Gamma\,(\Lift\,p\,A)
+  \end{alignat*}
+  Such that
+  \vspace{1em}
+  \begin{enumerate}
+    \item $\Lift$ preserves all basic type formers and has functorial action on $p \circ q$.
+    \item $\up$ has an inverse $\down$, preserves all basic term formers and has functorial action on $p \circ q$.
+    \item $(\Gamma \ext A) = (\Gamma \ext \Lift\,p\,A)$, and $\Tm\,\Gamma\,A = \Tm\,\Gamma\,(\Lift\,p\,A)$ and $\up\,t = t$.
+    %% \item $\Tm\,\Gamma\,A = \Tm\,\Gamma\,(\Lift\,p\,A)$.
+    %% \item $\up\,t = t$.
+  \end{enumerate}
+  \vspace{1em}
+  Above we mention basic type formers, although we haven't yet specified
+  those. The way this should be understood, is that any basic type former introduced
+  from now on should come equipped with preservation equations for lifting. This is
+  similar to how we mandate that any introduced type former must be natural with respect
+  to substitution.
+\item A universe structure
+  \begin{alignat*}{6}
+    &\U  &&: \{\Gamma : \Con\}(i\,j : \Lvl\,\Gamma) \to i < j \to \Ty\,\Gamma\,j\hspace{2em}
+    &\El &&: \Tm\,\Gamma\,(\U\,i\,j\,p) \to \Ty\,\Gamma\,i
+  \end{alignat*}
+  Such that $\Lift\,p\,(\U\,i\,j\,q) = \U\,i\,k\,(p \circ q)$, $\El$ has
+  inverse $\Code$, $\Tm\,\Gamma\,(\U\,i\,j\,p) = \Ty\,\Gamma\,i$ and $\El\,t =
+  t$.
+\item Basic type formers.
+\end{enumerate}
+\end{mydefinition}
+
+\begin{mydefinition}[IR model of TTDL]\label{def:ttdlmodel}
+ Assume an external $\Lvl$ structure such that it supports $l_0, l_1 : \Lvl$ and
+ $l_{01} : l_0 < l_1$ (the bootstrapping assumption). We again use the IR
+ universe constructions from Section \ref{sec:inductive_recursive_codes},
+ instantiated to the assumed $\Lvl$ structure. We describe components of the
+ model in order. Again, we write components of the model in \textbf{bold} font.
+\begin{enumerate}
+\item The base category remains unchanged from the TTGU model.
+\item For the level structure, we define $\bm{\Lvl}\,\Gamma = \Gamma \to \Lvl$ and
+  $i \bm{<} j = (\gamma : \Gamma) \to i\,\gamma < j\,\gamma$. Subsitution for internal
+  levels and morphisms is given by function composition with $\sigma : \Gamma \to \Delta$.
+  Internal composition and $\bm{<\!\msf{prop}}$ follow from the external counterparts.
+\item The internal bootstrapping assumption is modeled with the external counterpart.
+\item We define $\bm{\Ty}\,\Gamma\,i = (\gamma : \Gamma) \to \U\,(i\,\gamma)$ and
+  $\bm{\Tm}\,\Gamma\,A = (\gamma : \Gamma) \to \El\,(A\,\gamma)$. Substitution is
+  again function composition, and we have $\Gamma \bm{\ext} A = (\gamma :
+  \Gamma)\times \El\,(A\,\gamma)$.
+\item Type lifting is given by $\bm{\Lift}\,p\,A = \lambda\,\gamma.\,
+  \Lift\,(p\,\gamma)\,(A\,\gamma)$.  Similarly as in the TTGU model,
+  $\bm{\Tm}\,\Gamma\,A = \bm{\Tm}\,\Gamma\,(\bm{\Lift}\,p\,A)$ and $\Gamma \bm{\ext}
+  A = \Gamma \bm{\ext} (\bm{\Lift}\,p\,A)$ follow from the $\msf{ElLift}$
+  equality, and term lifting is the identity function.
+\item We define $\bm{\U}\,i\,j\,p = \lambda\,\gamma.\,\U'\,(p\,\gamma)$. Again,
+  we have $\bm{\Tm}\,\Gamma\,(\U\,i\,j\,p) = \bm{\Ty}\,\Gamma\,i$ by Lemma \ref{lem:ucomp},
+  and $\bm{\El}$ and $\bm{\Code}$ are identity functions.
+\item Basic type formers are interpreted using $\uir$ codes. Preservation of
+  type and term formers by lifting follows by the definition of $\Lift$ and
+  $\El$.
+\end{enumerate}
+\end{mydefinition}
+
+To summarize, the only interesting change compared to the TTGU model is that
+levels and level morphisms gain potential dependency on contexts. However, in the
+IR model, this is simply the addition of an extra semantic function parameter.
+
+\subsection{Level Reflection}\label{sec:level_reflection}
+
+\begin{mydefinition}[Level reflection rules]
+Assume that we have \emph{definitions for internal levels} in the syntax of TTDL (i.e.\
+the initial TTDL model):
+\begin{alignat*}{3}
+  &\Lvl^I               &&: \Ty\,\Gamma\,l_0\\
+  &l_0^I,\,l_1^I         &&: \Tm\,\Gamma\,\Lvl^I \\
+  &\blank\!<^I\!\blank  &&: \Tm\,\Gamma\,\Lvl^I \to \Tm\,\Gamma\,\Lvl^I \to \Ty\,\Gamma\,l_0\\
+  &l_{01}^{I}            &&: \Tm\,\Gamma\,(l_0^I <^I l_1^I)
+\end{alignat*}
+A \emph{reflection rule} for the above consists of
+\begin{enumerate}
+  \item $\mkLvl : \Tm\,\Gamma\,\Lvl^I \to \Lvl\,\Gamma$ with its inverse $\unLvl$, such that $\mkLvl\,l_0^I = l_0$ and $\mkLvl\,l_1^I = l_1$.
+  \item $\mkMor\,\,: \Tm\,\Gamma\,(i <^I j) \to \mkLvl\,i < \mkLvl\,i$ with its inverse
+        $\unMor$.
+\end{enumerate}
+\end{mydefinition}
+
+For any definition of internal levels, we may extend the specification of TTDL
+with the corresponding reflection rule, thereby getting an algebraic signature
+for a TTFL. We can easily get a TTFL with an IR model in the following
+way. First, pick an external $\Lvl$ structure which a) satisfies the
+bootstrapping assumption b) has sets of levels and morphisms which can be
+represented with syntactic TTDL types.
+
+For example, if $\Lvl$ = ($\Nat$, $\blank\!<\!\blank$), with $l_0 = 0$ and $l_1
+= 1$, and TTDL supports natural numbers, then we can define $\Lvl^I$ as the
+internal $\Nat_{l_0}$, and define $\blank\!<^I\!\blank$ as the usual ordering of
+numbers, using TTDL type formers and large elimination (which is available from
+$l_0 < l_1$). Then it follows that the model in Definition \ref{def:ttdlmodel},
+instantiated to the current level structure, satisfies level reflection. The
+model even supports the stricter $\Tm\,\Gamma\,\Nat_{l_0} = \Lvl\,\Gamma$
+equation, but in general it is easier to set up models if only an isomorphism
+is required.
+
+\section{Universe Features in TTFL}
+
+In this section we give a tour of some of the features expressible in TTFL.
+
+\textbf{Bounded universe polymorphism} is realized by quantifying
+over levels and morphisms with the usual $\Pi$ types. For example, if internal
+levels strictly correspond to natural numbers, we may have
+\begin{alignat*}{3}
+  &\msf{idUpTo3} : \Pi(l : \Nat_3)(p : l <^I 3)(A : \U\,l\,3\,(\mkMor\,p)) \to \Lift\,(\mkMor\,p)\,A \to \Lift\,(\mkMor\,p)\,A\\
+  &\msf{idUpTo3} = \lambda\,l\,p\,A\,a.\,a
+\end{alignat*}
+Here, we make sure that all types in the $\Pi$ are on the same level. We assume
+that internal levels are in $\Nat_0$, but we can bind an $l : \Nat_3$, because
+by cumulativity $l$ is also a term of $\Nat_0$.
+
+\textbf{Transfinite hierarchies} are naturally supported. For example, $\Lvl$
+can be identified with $\msf{Maybe}\,\Nat_0$, where $\msf{Nothing}$ defines
+$\omega$ and $\msf{Just}\,n$ is a finite level. Then, by the definition of
+morphisms, we have $<\!\omega : \Pi(n : \Nat_0) \to \msf{Just}\,n <^I \omega$.
+We can use this to quantify over finite levels, as in the following type:
+\begin{alignat*}{3}
+  \Pi(n : \Nat_{\omega})(A : \U\,n\,\omega\,(\mkMor\,(<\!\omega\,n))) \to \Lift\,(\mkMor\,(<\!\omega\,n))\,A \to \Lift\,(\mkMor\,(<\!\omega\,n))\,A
+\end{alignat*}
+
+\textbf{Induction on levels and level morphisms.} In Agda 2.6.1, there is an
+internal type of finite levels, and while construction rules and some built-in
+operations on levels are exposed, there is no general elimination rule on levels.
+Thus, there is a $\Nat \to \Lvl$ function but no non-constant $\Lvl \to \Nat$ one.
+In contrast, TTFL supports arbitrary elimination on levels, and in particular levels
+can be definitionally isomorphic to natural numbers.
+
+\textbf{Type formers returning in least upper bounds of levels}. It is common in
+type theories to allow type formers to have parameter types in different
+universe levels, say $i$ and $j$, and return in level $i \sqcup j$. In TTFL,
+whenever levels are \emph{trichotomous}, meaning that the ordering and equality of
+levels is internally decidable, then $\sqcup$ is a definable operation, and the
+``heterogeneous'' type formers are derivable\footnote{A level structure which is trichotonomous and supports \emph{extensionality}, i.e.\ $(\forall i.\, (i < j) \iff (i < k)) \to j = k$, is called a \emph{type-theoretic ordinal}. Assuming excluded middle type-theoretic ordinals are equivalent to classical ordinals \cite[Section 10.3]{hottbook}.}.
+
+\textbf{Coercive cumulative subtyping.} TTFL does not directly support
+subtyping. However, given enough type formers, it is possible to simply define
+subtyping as an interal inductive relation, and interpret a witness of $A \leq B$ as
+a coercion function from $A$ to $B$. Also, it should be possible to model a
+theory with cumulative subtyping by translation to coercions in TTFL.
+
+  %% data _≤_ (i : Lvl) (j : Lvl) : U i → U j → U (
+  %% U≤ : (p : i ≤ j) → U i ≤ U j
+  %% Π≤ : A ≤
+
+
+%% TTFL does not directly support a
+%% cumulative subtyping relation. However, it is possible to model subtyping by
+%% translation to coercions in TTFL. For example:
+%% \begin{itemize}
+%%   \item Given $p : i < j$, we may coerce terms from type $\U\,i\,k\,q$ to $\U\,j\,k\,(p \circ q)$,
+%%         using $\Lift\,p$.
+%%   \item If there is a coercion from $A$ to $A'$, and
+
+%% \end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

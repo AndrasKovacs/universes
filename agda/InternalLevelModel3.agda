@@ -138,7 +138,7 @@ L = record {
   _∘_    = λ {i}{j}{k} → <*-comp {i}{j}{k};
   wf     = <*-wf }
 
-open IR-Univ L
+open IR-Univ L hiding (Lvl'; _<'_)
 
 -- Base CwF
 --------------------------------------------------------------------------------
@@ -162,6 +162,9 @@ _∘ₛ_ : ∀ {Γ Δ ξ} → Sub Δ ξ → Sub Γ Δ → Sub Γ ξ
 Level : Con → Set
 Level Γ = Γ → Lvl
 
+Lt : ∀ {Γ} → Level Γ → Level Γ → Set
+Lt {Γ} i j = (γ : Γ) → i γ < j γ
+
 L0 : ∀ {Γ} → Level Γ
 L0 γ = 0
 
@@ -171,9 +174,6 @@ L1 γ = 1
 infixl 5 _[_]L
 _[_]L : ∀ {Γ Δ} → Level Δ → Sub Γ Δ → Level Γ
 _[_]L σ i γ = σ (i γ)
-
-Lt : ∀ {Γ} → Level Γ → Level Γ → Set
-Lt {Γ} i j = (γ : Γ) → i γ < j γ
 
 L01 : ∀ {Γ} → Lt (L0 {Γ}) (L1 {Γ})
 L01 γ = inj₁ refl
@@ -190,7 +190,7 @@ Ty : (Γ : Con) → Level Γ → Set
 Ty Γ i = (γ : Γ) → U (i γ)
 
 Lift : ∀ {Γ i j} → Lt {Γ} i j → Ty Γ i → Ty Γ j
-Lift p A γ = ↑ (p γ) (A γ)
+Lift p A = λ γ → ↑ (p γ) (A γ)
 
 infixl 5 _[_]T
 _[_]T : ∀ {Γ Δ i} → Ty Δ i → (σ : Sub Γ Δ) → Ty Γ (i [ σ ]L)
@@ -264,7 +264,7 @@ Bot γ = ⊥'
 --------------------------------------------------------------------------------
 
 Univ : ∀ {Γ} i j → Lt {Γ} i j → Ty Γ j
-Univ {Γ} i j p γ = U' (p γ)
+Univ {Γ} i j p = λ γ → U' (p γ)
 
 RussellUniv : ∀ {Γ i j p} → Tm Γ (Univ {Γ} i j p) ≡ Ty Γ i
 RussellUniv {Γ}{i}{j} = (λ f → ∀ x → f x) & ext λ γ → U↓-compute
