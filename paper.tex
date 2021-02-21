@@ -216,31 +216,6 @@ systems in this paper.
   universe polymorphism features and level computations.
 \end{enumerate}
 
-\noindent Several related topics are not handled in this paper.
-
-\begin{itemize}
-
-\item
-Besides consistency, we are often interested in \emph{canonicity},
-\emph{normalization} or other metatheoretical properties. The current work
-focuses on consistency and leaves other properties to future work. However, we
-do keep canonicity in mind while specifying our systems, and aim to avoid
-pitfalls which would cause canonicity to fail.
-\item
-We only focus on using universes as sized-based classifiers for
-types. Universe-like stratification is also present in two-level type theory
-\cite{twolevel}, modal type theories \cite{gratzer20multimodal} or as h-levels
-in homotopy type theory \cite{hottbook}, but we do not attempt to cover such use
-cases.
-\item
-We only cover predicative hierarchies.
-\item
-We do not discuss ergonomics and implementation of elaboration. Our goal is to
-develop a system which is as flexible as possible, even though that may not be
-the best suited for inference and elaboration. For example, first-class levels
-have undecidable ordering in general.
-\end{itemize}
-
 We provide an Agda formalization of the contents of the paper. The formalization
 is not complete, as we skip proofs involving an excessive number of equality
 coercions (which are more suited to informal reasoning, using equality
@@ -881,12 +856,12 @@ such that it can be also represented using TTDL type formers.
   (\sigma : \Sub\,\Gamma\,\Delta)\times \Tm\,\Gamma\,(A[\sigma])$, which is
   natural in $\Gamma$.
 \item A lifting structure with
+  %% \vspace{-0.5em}
   \begin{alignat*}{3}
     &\Lift &&: \{\Gamma : \Con\}\{i\,j : \Lvl\,\Gamma\} \to i < j \to \Ty\,\Gamma\,i \to \Ty\,\Gamma\,j\\
     &\up   &&: \{\Gamma : \Con\}\{i\,j : \Lvl\,\Gamma\}(p : i < j) \to \Tm\,\Gamma\,A \to \Tm\,\Gamma\,(\Lift\,p\,A)
   \end{alignat*}
   Such that
-  \vspace{1em}
   \begin{enumerate}
     \item $\Lift$ preserves all basic type formers and has functorial action on $p \circ q$.
     \item $\up$ has an inverse $\down$, preserves all basic term formers and has functorial action on $p \circ q$.
@@ -894,13 +869,14 @@ such that it can be also represented using TTDL type formers.
     %% \item $\Tm\,\Gamma\,A = \Tm\,\Gamma\,(\Lift\,p\,A)$.
     %% \item $\up\,t = t$.
   \end{enumerate}
-  \vspace{1em}
+
   Above we mention basic type formers, although we haven't yet specified
   those. The way this should be understood, is that any basic type former introduced
   from now on should come equipped with preservation equations for lifting. This is
   similar to how we mandate that any introduced type former must be natural with respect
   to substitution.
 \item A universe structure
+  %% \vspace{-0.5em}
   \begin{alignat*}{6}
     &\U  &&: \{\Gamma : \Con\}(i\,j : \Lvl\,\Gamma) \to i < j \to \Ty\,\Gamma\,j\hspace{2em}
     &\El &&: \Tm\,\Gamma\,(\U\,i\,j\,p) \to \Ty\,\Gamma\,i
@@ -1049,7 +1025,59 @@ with our IR semantics, unlike in the set-theoretic model of cumulativity for Coq
 \section{Related Work} \label{sec:related}
 
 
-\section{Future Work and Conclusion} \label{sec:conclusion}
+\section{Conclusion and Future Work} \label{sec:conclusion}
+
+In the current work, we developed a framework for modeling a variety of universe
+features in type theories. At this point, we may ask the question: if IR is
+sufficient to model every feature, why not simply add IR support in a practical
+implementation, and drop the menagerie of universe features?
+
+The answer is that IR provides is a \emph{deep embedding} of universe features,
+which is usually less convenient to use as \emph{native} features. For example,
+both Coq and Agda have powerful automatic solving for filling out implicit
+universe levels. We also do not have to invoke $\El$ or the $\ult$ computation
+rule explicitly, and in Coq we can use implicit syntax for subtyping instead of
+explicit coercions.
+
+This trade-off between convenience and formal minimalism is similar to the
+situation with inductive types. Formally, W-types and identity types are easier
+to handle than general inductive families, but the latter are far more
+convenient to actually use. Ideally, we would like to justify complicated
+convenience features by reduction to minimal features. With the current paper,
+we hope to have made progress in this manner.
+
+\subsection{Future Work}
+
+Several related are not discussed in this paper and could be subject to future
+work.
+
+First, besides consistency, we are often interested in \emph{canonicity},
+\emph{normalization} or other metatheoretical properties. The current work
+focuses on consistency and leaves other properties to future work. We did keep
+canonicity in mind when specifying the systems in this paper. Hopefully the
+usual proof method of gluing (in other words, proof-relevant logical predicates)
+\cite{kaposi2019gluing, sterling2019algebraic} can be adapted to the theories in
+this paper. It seems that the main task in doing so is to define proof-relevant
+logical predicates over $\uir$.
+
+Second, we only focus on using universes as sized-based classifiers for
+types. Stratification features are also present in two-level type theory
+\cite{twolevel}, modal type theories \cite{gratzer20multimodal} or as h-levels
+in homotopy type theory \cite{hottbook}. It would be interesting to port
+universe features in this paper to two-level type theory, as they would
+hopefully model a form of stage polymorphism in multi-stage compilation.
+
+Third, we do not discuss implementation strategies and ergonomics of universe
+features. Which universe hierarchies support good proof automation? What kind of
+impact do first-class levels have on elaboration algorithms? Hopefully the
+current work can aid answering these questions, by at least giving a way to quickly
+check if some features are logically consistent.
+
+Lastly, we do not handle impredicative universes. The main reason for this is
+that we do not know the consistency of having IR and impredicative function
+space together in the same universe, and modeling impredicativity seems to
+require this assumption in the metatheory. This could be investigated as well
+in future research.
 
 
 \bibliography{references}
