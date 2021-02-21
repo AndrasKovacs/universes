@@ -161,8 +161,8 @@ well-founded ordering. In the semantics, we show that induction-recursion can be
 used to model transfinite hierarchies, and also support lifting operations on
 type codes which strictly preserve type formers. Then, we consider a setup where
 universe levels are first-class types and subject to arbitrary internal
-reasoning. This generalizes the bounded universe polymorphism features of Coq
-and also the internal level computations in Agda.
+reasoning. This generalizes the bounded polymorphism features of Coq and at the
+same time the internal level computations in Agda.
 \end{abstract}
 
 \section{Introduction}
@@ -249,8 +249,6 @@ reflection), and instead focus on the key points.
 \section{Metatheory}
 \label{sec:metatheory}
 
-\todo{purge unused features}
-
 We work in a Martin-Löf type theory which has the following features.
 \begin{itemize}
   \item Two universes named $\Set0$ and $\Set1$, where $\Set0$ supports
@@ -264,13 +262,14 @@ We work in a Martin-Löf type theory which has the following features.
     working in extensional type theory, to avoid noise from equality transports.
   \item We write function types as $(x : A)\to B$ with $\lambda\,x.\,t$
     inhabitants, and $\Sigma$-types as $(x : A) \times B$, with pairing as
-    $(t,\, u)$ and projections as $t.1$ and $t.2$. We have $\top$ as the unit
-    type with inhabitant $\tt$, and $\bot$ as the empty type. Propositional identity
-    is written as $t = u$ with $\refl : t = t$.
+    $(t,\, u)$. We have $\top$ as the unit type with inhabitant $\tt$, and
+    $\bot$ as the empty type. Propositional identity is written as $t = u$
+    (coinciding with definitional equality).
   \item We occasionally use $\{x : A\} \to B$ for an Agda-like notation for
-    function types with implicit arguments, and omit implicit applications
-    whenever they can be inferred. We may omit implicit function types
-    altogether if it is clear where certain variables are quantified.
+    function types with implicit arguments. We usually omit implicit
+    applications but may explicitly write them as $t\,\{u\}$.  We may omit
+    implicit function types altogether if it is clear where certain variables
+    are quantified.
 \end{itemize}
 
 \section{Generalized Universe Hierarchies}
@@ -305,7 +304,7 @@ A \emph{category with family} (cwf) \cite{Dybjer96internaltype} consists of the 
   substituted, and substitution has functorial action. We use $A$, $B$, $C$ to
   refer to types and $t$, $u$, $v$ to refer to terms, and use $A[\sigma]$ and
   $t[\sigma]$ for substituting types and terms. Additionally, a family structure
-  has \emph{context comprehension} which consists of an context extension
+  has \emph{context comprehension} which consists of a context extension
   operation $\blank\ext\blank : (\Gamma : \Con) \to \Ty\,\Gamma \to \Con$
   together with an isomorphism $\Sub\,\Gamma\,(\Delta\ext A) \simeq ((\sigma :
   \Sub\,\Gamma\,\Delta) \times \Tm\,\Gamma\,(A[\sigma]))$ which is natural in
@@ -328,10 +327,10 @@ A \emph{category with family} (cwf) \cite{Dybjer96internaltype} consists of the 
 \end{itemize}
 
 There are other ways for presenting the basic categorical structure of models,
-which are nonetheless equivalent to cwfs, including natural models \cite{awodey18natural}
-and categories with attributes \cite{cartmellthesis}. We use the cwf presentation for its
-immediately algebraic character and closeness to syntax, as an explicit
-substitution calculus can be directly read off the specification.
+which are nonetheless equivalent to cwfs, including natural models
+\cite{awodey18natural} and categories with attributes \cite{cartmellthesis}. We
+use the cwf presentation for its immediately algebraic character and closeness
+to conventional explicit substitution syntax.
 
 \begin{notation}As De Bruijn indices are hard to read, we will mostly use
 nameful notation for binders. For example, assuming $\Nat : \{\Gamma : \Con\}
@@ -353,9 +352,9 @@ we may close a family over function types by assuming $\Pi : (A : \Ty\,\Gamma)
 $\beta\eta$-rules, and equations for the action of substitution on type and term
 formers.
 
-In the following, whenever we introduce a type former, we always assume that it
-is natural with respect to substitution, i.e.\ all type and term formers have a
-corresponding substitution rule.
+In the following, whenever we introduce a type or term former, we always assume
+that it is natural with respect to substitution, i.e.\ all type and term formers
+have a corresponding substitution rule.
 
 \subsection{Morphisms, Liftings and Inclusions of Families}
 \label{sec:morphisms}
@@ -395,7 +394,12 @@ on types, $\up : \Tm_0\,\Gamma\,A \to \Tm_1\,\Gamma\,(\Lift\,A)$ for the action
 on terms, and $\down$ for the inverse action on terms.
 \end{notation}
 
-\todo{Mention dependent right adjoints}
+We may think about the relation between \emph{modalities} and liftings.  The
+main difference is that we have no structural restrictions on variables and
+contexts. More concretely, every $\Lift$ is dependent right adjoint
+\cite{dependentrightadjoints} to the identity functor on the base category, as
+we have $\Tm\,(\msf{Id}\,\Gamma)\,A \simeq \Tm\,\Gamma\,(\Lift\,A)$. Hence,
+every lifting can be viewed as a degenerate modality.
 
 \paragraph{Two-level type theory}
 Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$) and a
@@ -456,7 +460,7 @@ eliminate from $\Bool_0$ to $\Bool_1$. If we have some $b :
 \Tm_1\,\Gamma\,\Bool_1$. Then, we can use $\Bool_1$ elimination, as in
 $\mathsf{if}\,\up\!b\,\,\mathsf{then}\,\true_1\,\mathsf{else}\,\false_1 :
 \Tm_1\,\Gamma\,\Bool_1$. The $\up$ computation ensures that the eliminator
-computes appropriately on canonical terms: if $b$ is $\true_0$, then we get
+computes appropriately on canonical terms: if $b$ is $\true_0$, we get
 $\up\!\true_0 = \true_1$ as the if-then-else scrutinee.
 
 A family inclusion corresponds to a \emph{cumulative hierarchy} consisting of
@@ -475,7 +479,7 @@ $\Ty_1$) is a family inclusion ($\Lift$, $\up$, $\down$) for which the following
 
 A strict inclusion corresponds to Sterling's \emph{algebraic cumulativity}
 \cite{sterling2019algebraic}. The additional equations are a matter of convenience: they allow us
-to omit term liftings in informal syntax\footnote{In a proof assistant, we would
+to omit term liftings in informal syntax\footnote{In a proof assistant, often we would
   still have to explicitly transport along the strict inclusion
   equations.}. Most of the time we can also omit level annotations
 on term formers. For example, we have $\true_0 : \Tm_0\,\Gamma\,\Bool_0$,
@@ -522,9 +526,9 @@ A relation $R : A \to A \to \Seti$ is \emph{well-founded} if $(a : A) \to
 \Acc\,R\,a$.
 \end{mydefinition}
 
-\begin{mylemma}
-Every well-founded relation is irreflexive \cite[Lemma 10.4.2]{hottbook}.
-\end{mylemma}
+%% \begin{mylemma}
+%% Every well-founded relation is irreflexive \cite[Lemma 10.4.2]{hottbook}.
+%% \end{mylemma}
 
 \begin{mydefinition} A \emph{level structure} consists of the following components:
 \begin{alignat*}{3}
@@ -574,8 +578,6 @@ former depends on levels in an interesting way. For example, $\Bool_i$ has the
 same canonical inhabitants as $\Bool_j$, for any $i$ and $j$. Universes
 introduce dependency on levels, by serving as classifiers for smaller families internally
 to larger families.
-
-\todo{find reference for Coquand univ}
 
 \begin{mydefinition} A family diagram supports \emph{universe formation} if it supports the following:
 \begin{alignat*}{3}
@@ -948,8 +950,8 @@ IR model, this is simply the addition of an extra semantic function parameter.
 \subsection{Level Reflection}\label{sec:level_reflection}
 
 \begin{mydefinition}[Level reflection rules]
-Assume that we have \emph{definitions for internal levels} in the syntax of TTDL (i.e.\
-the initial TTDL model):
+Assume that we have definitions for internal levels in the syntax of TTDL,
+i.e.\ all of the following are defined:
 \begin{alignat*}{3}
   &\Lvl^I               &&: \Ty\,\Gamma\,l_0\\
   &l_0^I,\,l_1^I         &&: \Tm\,\Gamma\,\Lvl^I \\
@@ -966,10 +968,10 @@ A \emph{reflection rule} for the above consists of
 
 For any definition of internal levels, we may extend the specification of TTDL
 with the corresponding reflection rule, thereby getting an algebraic signature
-for a TTFL. We can easily get a TTFL with an IR model in the following
-way. First, pick an external $\Lvl$ structure which a) satisfies the
-bootstrapping assumption b) has sets of levels and morphisms which can be
-represented with syntactic TTDL types.
+for a type theory with first-class levels (TTFL). We can easily get a TTFL with
+an IR model in the following way. First, pick an external $\Lvl$ structure which
+a) satisfies the bootstrapping assumption b) has sets of levels and morphisms
+which can be represented with syntactic TTDL types.
 
 For example, if $\Lvl$ = ($\Nat$, $\blank\!<\!\blank$), with $l_0 = 0$ and $l_1
 = 1$, and TTDL supports natural numbers, then we can define $\Lvl^I$ as the
@@ -983,7 +985,7 @@ is required.
 
 \section{Universe Features in TTFL}
 
-In this section we give a tour of some of the features expressible in TTFL.
+We describe some of the features expressible in TTFL.
 
 \textbf{Bounded universe polymorphism} is realized by quantifying
 over levels and morphisms with the usual $\Pi$ types. For example, if internal
@@ -1007,61 +1009,47 @@ We can use this to quantify over finite levels, as in the following type:
 
 \textbf{Induction on levels and level morphisms.} In Agda 2.6.1, there is an
 internal type of finite levels, and while construction rules and some built-in
-operations on levels are exposed, there is no general elimination rule on levels.
-Thus, there is a $\Nat \to \Lvl$ function but no non-constant $\Lvl \to \Nat$ one.
-In contrast, TTFL supports arbitrary elimination on levels, and in particular levels
-can be definitionally isomorphic to natural numbers.
+operations on levels are exposed, there is no general elimination rule on
+levels. Thus, there is a $\Nat \to \Lvl$ conversion function but it has no
+inverse. In contrast, TTFL supports arbitrary elimination on levels and
+morphisms.
 
 \textbf{Type formers returning in least upper bounds of levels}. It is common in
 type theories to allow type formers to have parameter types in different
 universe levels, say $i$ and $j$, and return in level $i \sqcup j$. In TTFL,
-whenever levels are \emph{trichotomous}, meaning that the ordering and equality of
-levels is internally decidable, then $\sqcup$ is a definable operation, and the
-``heterogeneous'' type formers are derivable\footnote{A level structure which is trichotonomous and supports \emph{extensionality}, i.e.\ $(\forall i.\, (i < j) \iff (i < k)) \to j = k$, is called a \emph{type-theoretic ordinal}. Assuming excluded middle type-theoretic ordinals are equivalent to classical ordinals \cite[Section 10.3]{hottbook}.}.
+whenever levels are \emph{trichotomous}, meaning that the ordering and equality
+of levels is internally decidable, $i \sqcup j$ can be defined as the greater of
+$i$ and $j$, and the ``heterogeneous'' type formers are derivable\footnote{A
+level structure which is trichotonomous and supports \emph{extensionality},
+i.e.\ $(\forall i.\, (i < j) \iff (i < k)) \to j = k$, is a
+\emph{type-theoretic ordinal}. Assuming excluded middle, type-theoretic
+ordinals are equivalent to classical ordinals \cite[Section 10.3]{hottbook}.}.
 
-\textbf{Coercive cumulative subtyping.} TTFL does not directly support
-subtyping. However, given enough type formers, it is possible to simply define
-subtyping as an interal inductive relation, and interpret a witness of $A \leq B$ as
-a coercion function from $A$ to $B$. Also, it should be possible to model a
-theory with cumulative subtyping by translation to coercions in TTFL.
+\textbf{Coercive cumulative subtyping.}
+TTFL as specified does not directly support cumulative subtyping. However, it is
+compatible with coercive subtyping. Consider the following rules:
+\begin{alignat*}{3}
+  &\blank\!\leq\!\blank &&: \Ty\,\Gamma\,i \to \Ty\,\Gamma\,j \to \Seti\\
+  &\msf{coerce} &&: A \leq B \to \Tm\,\Gamma\,A \to \Tm\,\Gamma\,B\\
+  &\leq\!\msf{refl} &&: A \leq A \\
+  &\U\!\leq    &&: i < i' \to \U\,i\,j\,p \leq \U\,i'\,k\,q\\
+  &\Pi\!\leq   &&: (p : A' \leq A) \to ((a' : \Tm\,\Gamma\,A')
+  \to B[x \mapsto \msf{coerce}\,p\,a'] \leq B'[x \mapsto a'])\\
+  & && \hspace{1em} \to \Pi(x : A) B \leq \Pi (x : A') B'
+\end{alignat*}
+Any model of TTFL can support the above rules: we can define
+$\blank\!\leq\!\blank$ and $\msf{coerce}$ by indexed induction-recursion
+\cite{indexedir}, where we define coercion along $\U\!\leq$ by type lifting, and
+coercion along $\Pi\!\leq$ by backwards-forwards coercion.
 
-  %% data _≤_ (i : Lvl) (j : Lvl) : U i → U j → U (
-  %% U≤ : (p : i ≤ j) → U i ≤ U j
-  %% Π≤ : A ≤
+Note that $\Pi$ is contravariant in the domain. This is easily supported
+with our IR semantics, unlike in the set-theoretic model of cumulativity for Coq
+\cite{timany2018cumulative}, where function domains are invariant.
 
-
-%% TTFL does not directly support a
-%% cumulative subtyping relation. However, it is possible to model subtyping by
-%% translation to coercions in TTFL. For example:
-%% \begin{itemize}
-%%   \item Given $p : i < j$, we may coerce terms from type $\U\,i\,k\,q$ to $\U\,j\,k\,(p \circ q)$,
-%%         using $\Lift\,p$.
-%%   \item If there is a coercion from $A$ to $A'$, and
-
-%% \end{itemize}
-
-
-
-
-
-
-
-
+\section{Related Work} \label{sec:related}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-%% --------------------------------------------------------------------------------
+\section{Future Work and Conclusion} \label{sec:conclusion}
 
 
 \bibliography{references}

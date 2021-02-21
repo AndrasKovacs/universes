@@ -154,7 +154,6 @@ module IR-Univ (lvl : LvlStruct) where
   ↑U p a = ↑ p (coe U↓-compute a)
 
 
-
 -- Additional assumption: levels bounded by ordinals.
 -- Corresponds to type-theoretic ordinal in HoTT book section 10.4
 record Ordinal (lvl : LvlStruct) : Set where
