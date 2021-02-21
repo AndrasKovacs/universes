@@ -959,7 +959,7 @@ model even supports the stricter $\Tm\,\Gamma\,\Nat_{l_0} = \Lvl\,\Gamma$
 equation, but in general it is easier to set up models if only an isomorphism
 is required.
 
-\section{Universe Features in TTFL}
+\subsection{Universe Features in TTFL}
 
 We describe some of the features expressible in TTFL.
 
@@ -982,6 +982,8 @@ We can use this to quantify over finite levels, as in the following type:
 \begin{alignat*}{3}
   \Pi(n : \Nat_{\omega})(A : \U\,n\,\omega\,(\mkMor\,(<\!\omega\,n))) \to \Lift\,(\mkMor\,(<\!\omega\,n))\,A \to \Lift\,(\mkMor\,(<\!\omega\,n))\,A
 \end{alignat*}
+This type is in $\Ty\,\Gamma\,\omega$, but it is not in any universe, since
+$\omega$ is the greatest level.
 
 \textbf{Induction on levels and level morphisms.} In Agda 2.6.1, there is an
 internal type of finite levels, and while construction rules and some built-in
@@ -1022,8 +1024,48 @@ Note that $\Pi$ is contravariant in the domain. This is easily supported
 with our IR semantics, unlike in the set-theoretic model of cumulativity for Coq
 \cite{timany2018cumulative}, where function domains are invariant.
 
+\subsection{Effects of Choice of Level Structure}
+
+TTFL features clearly vary depending on level structures. We make some basic
+observations.
+
+\begin{itemize}
+\item We did not mandate that the level of $\Lvl^I$ is the least level,
+i.e.\ that $l_0 < i$ for every $i \neq l_0$. If this holds, then it is
+possible to have level polymorphism at every level: at $l_0$ we can just bind
+a $\Lvl^I$, and at every other level, we can lift $\Lvl^I$ to that
+level. However, levels are not necessarily totally ordered, and $l_0$ does not
+have to be the least. This means that universe polymorphism is prohibited in
+levels which are not connected to $l_0$.
+
+\item If levels are given by a limit ordinal, then every TTFL type is contained
+in a universe. If levels form a successor ordinal, then this is not the
+case. For example, Agda 2.6.1 has $\omega + 1$ levels (externally), where
+$\Set{\omega}$ is the topmost universe, but $\Set{\omega}$ has no type.
+
+\item
+While it is possible to quantify over all levels (using plain $\Pi$ types), it
+is not possible to have level polymorphism over all levels. We may try to type
+an identity function for all levels, as $\Pi(i : \Lift\,?\,\Lvl^I)(A :
+\U\,(\mkLvl\,i)\,?\,?) \to \Lift\,?\,A \to \Lift\,?\,A$. The issue is in
+$\U\,(\mkLvl\,i)\,?\,?$, where we have to find a level which is larger than
+\emph{every} level. The solution to this issue is to simply add more levels. For
+example, for polymorphism over finite levels, we may pick $\omega + \omega$ as
+the first limit ordinal which can internally type finite level polymorphism;
+this is what Agda 2.6.2 does.
+\end{itemize}
+
+
 \section{Related Work} \label{sec:related}
 
+Universes:
+Martin-Löf (U in U), Girard, Martin-Löf (countable predicative),
+CoC, Coq, Luo ECC. Universe poly in Agda (?), in Coq, cumulativity,
+Sterling, Coquand normalization (?)
+
+Transfinite: super, higher-order, Mahlo, IR, indexed IR
+
+Harper univ checking?
 
 \section{Conclusion and Future Work} \label{sec:conclusion}
 
