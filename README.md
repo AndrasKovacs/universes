@@ -1,3 +1,0 @@
-
-# universes
-Generalized universe hierarchies.
