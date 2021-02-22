@@ -426,10 +426,10 @@ family, is also contained in the target family.
 In general, we can skip specifying preservation for $\down$, since it follows from $\up$ preservation
 equations.
 
-Assume an inclusion from ($\Ty_0$, $\Tm_0$) to ($\Ty_1$, $\Tm_0$). Now, we can
+Assume an inclusion from ($\Ty_0$, $\Tm_0$) to ($\Ty_1$, $\Tm_1$). Now, we can
 eliminate from $\Bool_0$ to $\Bool_1$. If we have some $b :
 \Tm_0\,\Gamma\,\Bool_0$, we also have $\up\!b :
-\Tm_1\,\Gamma\,(\Lift_1\,\Bool_0)$, hence $\up\!b :
+\Tm_1\,\Gamma\,(\Lift\,\Bool_0)$, hence $\up\!b :
 \Tm_1\,\Gamma\,\Bool_1$. Then, we can use $\Bool_1$ elimination, as in
 $\mathsf{if}\,\up\!b\,\,\mathsf{then}\,\true_1\,\mathsf{else}\,\false_1 :
 \Tm_1\,\Gamma\,\Bool_1$. The $\up$ computation ensures that the eliminator
@@ -1017,7 +1017,8 @@ compatible with coercive subtyping. Consider the following rules:
 Any model of TTFL can support the above rules: we can define
 $\blank\!\leq\!\blank$ and $\msf{coerce}$ by indexed induction-recursion
 \cite{indexedir}, where we define coercion along $\U\!\leq$ by type lifting, and
-coercion along $\Pi\!\leq$ by backwards-forwards coercion.
+coercion along $\Pi\!\leq$ by backwards-forwards coercion. It is possible to
+extend the subtyping relation with rules for other basic type formers.
 
 Note that $\Pi$ is contravariant in the domain. This is easily supported
 with our IR semantics, unlike in the set-theoretic model of cumulativity for Coq
@@ -1081,28 +1082,28 @@ It is worth to summarize here the universe features in the current
 type theory implementations.
 
 \textbf{Agda 2.6.1} has $\omega+1$-many non-cumulative predicative universes as
-$\Set{i}$, with optional cumulative subtyping only for universes (and not other
-type formers) \cite{agdadocs}.  It also has an internal type $\msf{Level} : \Set0$ for finite
+$\Set{i}$, with optional cumulative subtyping only for universes
+\cite{agdadocs}.  It also has an internal type $\msf{Level} : \Set0$ for finite
 levels (hence, exluding $\omega$), which supports constructors and some built-in
-operations, but no general elimination rule. There is also an $\omega$-bounded
-parallel hierarchy $\msf{Prop_i}$ for strict propositions \cite{sprop}. Agda
-2.6.2 will extend the hierarchy to $\omega * 2$.
+operations, but no general elimination rule. There is also a countable parallel
+hierarchy $\msf{Prop_i}$ for strict propositions \cite{sprop}. Agda 2.6.2 will
+extend the $\Set{i}$ hierarchy to $\omega * 2$.
 
 \textbf{Coq 8.13} has $\omega$-many cumulative predicative universes with
 cumulative subtyping for all type formers \cite{timany18cumulative}. It supports
 bounded universe polymorphism, but it has no internal type for levels, and
-universe polymorphic definition are not internally typeable. It also optionally
-has an impredicative $\msf{Prop}$ universe and optionally impredicative bottom
-$\Seti$ universe. Version 8.13 added experimental support for a parallel
-$\omega$-bounded cumulative hierarchy for strict propositions.
+universe polymorphic definitions are not internally typeable. It also has an
+impredicative $\msf{Prop}$ universe and optionally impredicative bottom $\Seti$
+universe. Version 8.13 added experimental support for a parallel
+countable cumulative hierarchy for strict propositions.
 
 \textbf{Lean 3.3} has countable non-cumulative predicative $\msf{Type}_i$
 universes with universe polymorphism, and no internal type of levels
 \cite{leanmanual}. It also has strict impredicative $\msf{Prop}$.
 
-\textbf{Idris 1} has countable cumulative universes with cumulative subtyping
-only for universes, typical-ambiguity-style level inference and no universe
-polymorphism \cite{idrisdocs}.
+\textbf{Idris 1} has countable cumulative predicative universes with cumulative
+subtyping only for universes, typical-ambiguity-style level inference and no
+universe polymorphism \cite{idrisdocs}.
 
 Of the above features, what TTFL does not support is a) impredicativity b) the
 interaction of $\msf{Prop}$ and $\msf{Type}$ universes, i.e. the restrictions on

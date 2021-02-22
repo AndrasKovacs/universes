@@ -1,11 +1,15 @@
 
 {-# OPTIONS --postfix-projections #-}
 
--- Notes on Palmgren's super universe: http://www2.math.uu.se/~palmgren/universe.pdf
+{-
+Notes on Palmgren's super universe: http://www2.math.uu.se/~palmgren/universe.pdf
 
--- Summary of super and Mahlo universes:
---   (U, El) is *super* if every internal family is contained in an internal sub-universe
---   (U, El) is *Mahlo* if for every internal (Famᵘ → Famᵘ) operator there is an internal sub-universe closed under it.
+We investigate recursive sub-universes and transfinite levels.
+
+Summary of super and Mahlo universes:
+  (U, El) is *super* if every internal family is contained in an internal sub-universe
+  (U, El) is *Mahlo* if for every internal (Famᵘ → Famᵘ) operator there is an internal sub-universe closed under it.
+-}
 
 module Super where
 
@@ -13,6 +17,7 @@ open import Lib
 open import Data.Nat
 open import Function
 
+-- simple tree ordinals (Brouwer ordinals) for indexing purposes
 data O : Set where
   zero : O
   suc  : O → O
@@ -27,6 +32,7 @@ data O : Set where
 
 module Cumulative where
 
+  -- universe operator
   module _ {U : Set}{El : U → Set} where
 
     data UU : Set
@@ -70,14 +76,15 @@ module Cumulative where
   û^ zero    = ℕ' , (λ _ → ℕ')
   û^ (suc n) = û (û^ n)
 
-  -- code for transfinite universe
+  -- codes for some transfinite universes
   Uω : V
   Uω = UU' (Σ' ℕ' λ n → û^ n .₁) (λ {(n , a) → û^ n .₂ a})
 
   Uω' : V
   Uω' = UU' ℕ' (₁ ∘ û^)
 
-  module NatU where  -- cumulative, non-recursive sub-universes
+  -- cumulative, non-recursive sub-universes
+  module NatU where
     U : ℕ → Set
     El : ∀ {n} → U n → Set
     U  zero      = ⊥
@@ -90,7 +97,9 @@ module Cumulative where
     ↑El : ∀ {n a} → El (↑ {n} a) ≡ El a  -- not recursive: ↑ ℕ' ≢ ℕ'
     ↑El {suc n} {a} = refl
 
-  module NatU2 where     -- cumulative, recursive sub-universes (but not transfinite)
+
+  -- cumulative, recursive sub-universes (but not transfinite)
+  module NatU2 where
 
     U : ℕ → Set
     El : ∀ {n} → U n → Set
@@ -113,7 +122,8 @@ module Cumulative where
        (λ b → (∀ x → b x)) & (_∋_ ((λ x → El (b x)) ≡ (λ x → El (↑ (b x)))) (ext λ x → El≡ (b x)))
     El≡ {suc n} ℕ' = refl
 
-  module OU where -- transfinite, but non-recursive
+  -- transfinite, but non-recursive
+  module OU where
 
     U : O → Set
     El : ∀ {i} → U i → Set

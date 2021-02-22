@@ -1,6 +1,4 @@
 
-
-
 module Lib where
 
 open import Data.Unit using (⊤; tt) public
@@ -14,9 +12,7 @@ open import Relation.Binary.PropositionalEquality
   hiding (decSetoid; preorder; setoid; [_]) public
 
 import Level as L
-
-module F where
-  open import Function public
+module F where open import Function public
 
 coe : ∀ {α}{A B : Set α} → A ≡ B → A → B
 coe refl x = x
