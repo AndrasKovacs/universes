@@ -168,12 +168,11 @@ same time the internal level computations in Agda.
 \section{Introduction}
 \label{sec:introduction}
 
-Users of type theories often view universe levels as an unwieldy bureaucratic
-detail, a necessary annoyance in service of boosting expressive power while
-retaining logical consistency. However, universe hierarchies are not going away
-any time soon in practical implementations of type theory. In recent
-developments of systems, we are getting more universes and more adjacent
-features:
+Users of type theories often view universe levels as a bureaucratic detail, a
+necessary annoyance in service of boosting expressive power while retaining
+logical consistency. However, universe hierarchies are not going away any time
+soon in practical implementations of type theory. In recent developments of
+systems, we are getting more universes and more adjacent features:
 \begin{itemize}
 \item Agda recently added a limited cumulativity as an optional feature
   for universes \cite{agdadocs}, and the upcoming 2.6.2 version will extend the $\omega+1$
@@ -187,7 +186,7 @@ formal metatheory of type theories. Do type formers stay in the same
 universe, or take the $\sqcup$ of universes of constituent types? Can
 eliminators target any universe, or do we instead use lifting operators to cross
 levels? What kind of universe polymorphism do we have, can we quantify over
-bounds? Is there a type of levels, or are levels in a separate syntactic layer?
+level bounds? Is there a type of levels, or are levels in a separate syntactic layer?
 
 The aim of the current work is to develop semantics which covers as much as
 possible from the range of sensible universe features. This way, theorists and
@@ -235,9 +234,10 @@ We work in a Martin-Löf type theory which has the following features.
     working in extensional type theory, to avoid noise from equality transports.
   \item We write function types as $(x : A)\to B$ with $\lambda\,x.\,t$
     inhabitants, and $\Sigma$-types as $(x : A) \times B$, with pairing as
-    $(t,\, u)$. We have $\top$ as the unit type with inhabitant $\tt$, and
-    $\bot$ as the empty type. Propositional identity is written as $t = u$
-    (coinciding with definitional equality).
+    $(t,\, u)$. We have $\top$ as the unit type with inhabitant $\tt$, $\bot$ as
+    the empty type, and $\Bool$ with $\true$ and $\false$
+    inhabitants. Propositional identity is written as $t = u$ (coinciding with
+    definitional equality).
   \item We occasionally use $\{x : A\} \to B$ for an Agda-like notation for
     function types with implicit arguments. We usually omit implicit
     applications but may explicitly write them as $t\,\{u\}$.  We may omit
@@ -269,7 +269,7 @@ A \emph{category with family} (cwf) \cite{Dybjer96internaltype} consists of the 
   $\emptycon$ with unique morphism $\epsilon : \Sub\,\Gamma\,\emptycon$. In
   initial models (that is, syntaxes) of type theories, objects correspond to
   typing contexts, morphisms to parallel substitutions and the terminal object to
-  the empty context; this informs the naming scheme that we use here.
+  the empty context; this informs the naming scheme.
 \item A \emph{family structure}, containing $\Ty : \Con \to \Seti$ and $\Tm :
   (\Gamma : \Con) \to \Ty\,\Gamma \to \Seti$, where $\Ty$ is a presheaf over the
   category of contexts and $\Tm$ is a presheaf over the category of elements of
@@ -407,7 +407,7 @@ $\sim\!\blank$.
 
 While the staging aspect could be subject of future research, we currently focus
 on ``sizing'' hierarchies instead of staging hierarchies. This means that we
-want to eliminate from any family to any other family which is ``connected'' by
+want to eliminate from any family to any other family which is connected by
 a morphism.
 
 \begin{mydefinition}\label{def:inclusion}
@@ -582,10 +582,10 @@ in our notation, but they involve different $\blank[\blank]$ operations.
 Unlike every other type or term former, there is no lifting computation rule for
 $\El$ and $\Code$. Intuitively, the issue is that we would need to relate type
 lifting and term lifting, but while term lifting is invertible, type lifting is
-not. $\Lift$ sends a $\Ty_i\,\Gamma$ to a $\Ty_j\,\Gamma$, and a larger $\Ty$ is
-not isomorphic a smaller one, because it contains more universes. So, for
-example, lifting $\Bool_0 : \Ty_0\,\Gamma$ as a type to $\Ty_1\,\Gamma$ yields
-$\Bool_1$, but lifting $\Bool_0$ as a term yields $\Bool_0$.
+not. $\Lift$ sends a $\Ty_i\,\Gamma$ to a $\Ty_j\,\Gamma$, and $\Ty_j\,\Gamma$
+is not isomorphic to $\Ty_i\,\Gamma$, because it contains more universes. So,
+for example, lifting $\Bool_0 : \Ty_0\,\Gamma$ as a type to $\Ty_1\,\Gamma$
+yields $\Bool_1$, but lifting $\Bool_0$ as a term yields $\Bool_0$.
 
 Assuming Coquand or Russell universes and $p : i < j$, we can recover
 polymorphic functions, for example, we may have $\mi{id} : \Pi(A : \U\,i\,j\,p)
@@ -961,16 +961,17 @@ is required.
 
 We describe some of the features expressible in TTFL.
 
-\textbf{Bounded universe polymorphism} is realized by quantifying
-over levels and morphisms with the usual $\Pi$ types. For example, if internal
-levels strictly correspond to natural numbers, we may have
+\textbf{Bounded universe polymorphism} is realized by quantifying over levels
+and morphisms with the usual $\Pi$ types. For example, if levels strictly
+correspond to internal natural numbers, we may have
 \begin{alignat*}{3}
-  &\msf{idUpTo3} : \Pi(l : \Nat_3)(p : l <^I 3)(A : \U\,l\,3\,(\mkMor\,p)) \to \Lift\,(\mkMor\,p)\,A \to \Lift\,(\mkMor\,p)\,A\\
+  &\msf{idUpTo3} : \Pi(l : \Nat_3)(p : \Lift_0^3(l <^I 3))(A : \U\,l\,3\,(\mkMor\,p)) \to \Lift\,(\mkMor\,p)\,A \to \Lift\,(\mkMor\,p)\,A\\
   &\msf{idUpTo3} = \lambda\,l\,p\,A\,a.\,a
 \end{alignat*}
-Here, we make sure that all types in the $\Pi$ are on the same level. We assume
-that internal levels are in $\Nat_0$, but we can bind an $l : \Nat_3$, because
-by cumulativity $l$ is also a term of $\Nat_0$.
+Here, we make sure that all types are on the same level, by appropriate
+lifting. We assume that internal levels are in $\Nat_0$, but we can bind an $l :
+\Nat_3$, because by cumulativity $l$ is also a term of $\Nat_0$. Likewise, the
+$p$ variable is a term of $\Lift_0^3(l <^I 3)$ and $l <^I 3$ as well.
 
 \textbf{Transfinite hierarchies} are naturally supported. For example, $\Lvl$
 can be identified with $\msf{Maybe}\,\Nat_0$, where $\msf{Nothing}$ defines
@@ -1020,7 +1021,7 @@ coercion along $\Pi\!\leq$ by backwards-forwards coercion.
 
 Note that $\Pi$ is contravariant in the domain. This is easily supported
 with our IR semantics, unlike in the set-theoretic model of cumulativity for Coq
-\cite{timany2018cumulative}, where function domains are invariant.
+\cite{timany18cumulative}, where function domains are invariant.
 
 \subsection{Effects of Choice of Level Structure}
 
@@ -1130,8 +1131,8 @@ we hope to have made progress in this manner.
 
 \subsection{Future Work}
 
-Several related are not discussed in this paper and could be subject to future
-work.
+Several related topics are not discussed in this paper and could be subject to
+future work.
 
 First, besides consistency, we are often interested in \emph{canonicity},
 \emph{normalization} or other metatheoretical properties. The current work
@@ -1139,17 +1140,16 @@ focuses on consistency and leaves other properties to future work. We did keep
 canonicity in mind when specifying the systems in this paper. Hopefully the
 usual proof method of gluing (in other words, proof-relevant logical predicates)
 \cite{kaposi2019gluing, sterling2019algebraic} can be adapted to the theories in
-this paper. It seems that the main task in doing so is to define proof-relevant
-logical predicates over $\uir$.
+this paper.
 
 Second, we only focus on using universes as sized-based classifiers for
 types. Stratification features are also present in two-level type theory
 \cite{twolevel}, modal type theories \cite{gratzer20multimodal} or as h-levels
 in homotopy type theory \cite{hottbook}. It would be interesting to port
 universe features in this paper to two-level type theory, as they would
-hopefully model a form of stage polymorphism in multi-stage compilation. It
-would be nice to try representing $\msf{Prop}$ universes in TTFL as well;
-this is closed related to h-level based stratification.
+hopefully model a form of stage polymorphism in multi-stage compilation. We
+could try representing $\msf{Prop}$ universes in TTFL as well. This is closely
+related to h-level based stratification.
 
 Third, we do not discuss implementation strategies and ergonomics of universe
 features. Which universe hierarchies support good proof automation? What kind of
@@ -1161,8 +1161,7 @@ Lastly, we do not handle impredicative universes. The main reason for this is
 that we do not know the consistency of having IR and impredicative function
 space together in the same universe, and modeling impredicativity seems to
 require this assumption in the metatheory. This could be investigated as well
-in future research.
-
+in future work.
 
 \bibliography{references}
 \end{document}
