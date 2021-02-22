@@ -174,15 +174,13 @@ retaining logical consistency. However, universe hierarchies are not going away
 any time soon in practical implementations of type theory. In recent
 developments of systems, we are getting more universes and more adjacent
 features:
-
 \begin{itemize}
-\item Agda recently added a limited version cumulativity as an optional feature
+\item Agda recently added a limited cumulativity as an optional feature
   for universes \cite{agdadocs}, and the upcoming 2.6.2 version will extend the $\omega+1$
   universe hierarchy to $\omega*2$.
-\item Coq added support for cumulative inductive types \cite{timany18cumulative}, and added a form of
-  bounded universe polymorphism \cite{ziliani15unification}.
+\item Coq added support for cumulative inductive types \cite{timany18cumulative}
+  and a form of bounded universe polymorphism \cite{ziliani15unification}.
 \end{itemize}
-
 \noindent At this point, there is a veritable zoo of universe features in existing
 implementations. We have perhaps even more design choices when considering the
 formal metatheory of type theories. Do type formers stay in the same
@@ -807,7 +805,7 @@ specification and semantics for each choice of level structure; instead, we aim
 to have a more generic solution.
 \begin{enumerate}
   \item We first give a specification of \emph{type theory with dependent
-        levels}, or TTDL, where levels and level morphism may depend on typing contexts.
+        levels}, or TTDL, where levels and level morphisms may depend on typing contexts.
         Here, liftings, universes and type formers are specified, but the internal
         structure of levels is not yet pinned down.
   \item We show that we can extend TTDL with \emph{level reflection} rules, which identify
@@ -1048,24 +1046,66 @@ While it is possible to quantify over all levels (using plain $\Pi$ types), it
 is not possible to have level polymorphism over all levels. We may try to type
 an identity function for all levels, as $\Pi(i : \Lift\,?\,\Lvl^I)(A :
 \U\,(\mkLvl\,i)\,?\,?) \to \Lift\,?\,A \to \Lift\,?\,A$. The issue is in
-$\U\,(\mkLvl\,i)\,?\,?$, where we have to find a level which is larger than
-\emph{every} level. The solution to this issue is to simply add more levels. For
-example, for polymorphism over finite levels, we may pick $\omega + \omega$ as
-the first limit ordinal which can internally type finite level polymorphism;
-this is what Agda 2.6.2 does.
+$\U\,(\mkLvl\,i)\,?\,?$, where we would have to find a level which is larger
+than \emph{every} level. The solution to this issue is to simply add more
+levels. For example, for polymorphism over finite levels, we may pick $\omega +
+\omega$ as the first limit ordinal which can internalize finite level
+polymorphism; this is what Agda 2.6.2 does.
 \end{itemize}
 
 
 \section{Related Work} \label{sec:related}
 
-Universes:
-Martin-Löf (U in U), Girard, Martin-Löf (countable predicative),
-CoC, Coq, Luo ECC. Universe poly in Agda (?), in Coq, cumulativity,
-Sterling, Coquand normalization (?)
+Predicative hierarchies originate as Russell's ramified type theories
+\cite{principia}. In the more modern formulations of type theory, Martin-Löf
+proposed a countable predicative hierarchy \cite{martinlof73predicative}, as a
+way to remedy the inconsistency of the previous version of the theory (which
+assumed type-in-type). Harper and Pollack described universe inference with
+level assignments and also a form of level polymorphism \cite{harperpollack}.
+Sterling \cite{sterling2019algebraic} gave an algebraic specification much like
+ours for a type theory with countable cumulative universes, and prove canonicity
+for it.
 
-Transfinite: super, higher-order, Mahlo, IR, indexed IR
+There have been proposals for strengthening universes with various closure
+principles and universe operators. Palmgren's super universes and higher-order
+universes \cite{Palmgren98onuniverses} and Setzer's Mahlo universes
+\cite{setzer00mahlo} are examples for this. These are sufficient to model
+transfinite hierarchies, but as we noted in Section
+\ref{sec:inductive_recursive_codes}, we do not know how to model strict
+inclusions with them. Variants of induction-recursion \cite{dybjer99finite,
+  indexedir, positiveir} are particularly flexible and powerful extensions to
+universes.
 
-Harper univ checking?
+It is worth to summarize here the universe features in the current
+type theory implementations.
+
+\textbf{Agda 2.6.1} has $\omega+1$-many non-cumulative predicative universes as
+$\Set{i}$, with optional cumulative subtyping only for universes (and not other
+type formers) \cite{agdadocs}.  It also has an internal type $\msf{Level} : \Set0$ for finite
+levels (hence, exluding $\omega$), which supports constructors and some built-in
+operations, but no general elimination rule. There is also an $\omega$-bounded
+parallel hierarchy $\msf{Prop_i}$ for strict propositions \cite{sprop}. Agda
+2.6.2 will extend the hierarchy to $\omega * 2$.
+
+\textbf{Coq 8.13} has $\omega$-many cumulative predicative universes with
+cumulative subtyping for all type formers \cite{timany18cumulative}. It supports
+bounded universe polymorphism, but it has no internal type for levels, and
+universe polymorphic definition are not internally typeable. It also optionally
+has an impredicative $\msf{Prop}$ universe and optionally impredicative bottom
+$\Seti$ universe. Version 8.13 added experimental support for a parallel
+$\omega$-bounded cumulative hierarchy for strict propositions.
+
+\textbf{Lean 3.3} has countable non-cumulative predicative $\msf{Type}_i$
+universes with universe polymorphism, and no internal type of levels
+\cite{leanmanual}. It also has strict impredicative $\msf{Prop}$.
+
+\textbf{Idris 1} has countable cumulative universes with cumulative subtyping
+only for universes, typical-ambiguity-style level inference and no universe
+polymorphism \cite{idrisdocs}.
+
+Of the above features, what TTFL does not support is a) impredicativity b) the
+interaction of $\msf{Prop}$ and $\msf{Type}$ universes, i.e. the restrictions on
+$\msf{Prop}$ elimination.
 
 \section{Conclusion and Future Work} \label{sec:conclusion}
 
@@ -1107,7 +1147,9 @@ types. Stratification features are also present in two-level type theory
 \cite{twolevel}, modal type theories \cite{gratzer20multimodal} or as h-levels
 in homotopy type theory \cite{hottbook}. It would be interesting to port
 universe features in this paper to two-level type theory, as they would
-hopefully model a form of stage polymorphism in multi-stage compilation.
+hopefully model a form of stage polymorphism in multi-stage compilation. It
+would be nice to try representing $\msf{Prop}$ universes in TTFL as well;
+this is closed related to h-level based stratification.
 
 Third, we do not discuss implementation strategies and ergonomics of universe
 features. Which universe hierarchies support good proof automation? What kind of
