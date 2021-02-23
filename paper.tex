@@ -381,23 +381,22 @@ lifting between them. This corresponds to a basic version of \emph{two-level
 $\Tm_1$) as a metaprogramming layer which can generate object-level programs in
 the ($\Ty_0$, $\Tm_0$) layer.
 
-Lifted types correspond to types of object-level expressions; for
-example, $\Bool_0 : \Ty_0\,\Gamma$ is the object-level type of Booleans, while
+Lifted types correspond to types of object-level expressions; for example,
+$\Bool_0 : \Ty_0\,\Gamma$ is the object-level type of Booleans, while
 $\Lift\,\Bool_0$ is the meta-level type of $\Bool_0$-expressions, and $\Bool_1 :
 \Ty_1\,\Gamma$ is the type of meta-level Booleans. It is possible to compute a
-$\Lift\,\Bool_0$ from a $\Bool_1$. Given $b : \Tm_1\,\Gamma\,\Bool_1$, we can
-construct
+$\Bool_0$ from a $\Bool_1$. Given $b : \Tm_1\,\Gamma\,\Bool_1$, we can construct
 $\down(\mathsf{if}\,b\,\mathsf{then}\up\!\true_0\,\mathsf{else}\up\!\false_0) :
 \Tm_0\,\Gamma\,\Bool_0$.
 
-But there is no way to compute a $\Bool_1$ from a $\Lift\,\Bool_0$, since
-$\Lift\,\Bool_0$ has no elimination rule in $\Ty_1$. Conceptually, terms
-of $\Lift\,\Bool_0$ are \emph{expressions}, so they are not necessarily $\true$ or
-$\false$, they can also be variables or neutral expressions, so the usual
-Boolean elimination is not justified for them. In general, the setup ensures that
-we can eliminate from positive types in $\Ty_1$ to their counterparts in
-$\Ty_0$, but not the other way around, while negative types are preserved by
-$\Lift$ up to type isomorphism.
+But there is no way to compute a $\Bool_1$ from a $\Bool_0$: we can try to lift
+the input, but there is no elimination rule for $\Lift\,\Bool_0$ in
+$\Ty_1$. Conceptually, terms of $\Lift\,\Bool_0$ are \emph{expressions}, so they
+are not necessarily $\true$ or $\false$, they can also be variables or neutral
+expressions, so the usual Boolean elimination is not justified for them. In
+general, the setup ensures that we can eliminate from positive types in $\Ty_1$
+to their counterparts in $\Ty_0$, but not the other way around, while negative
+types are preserved by $\Lift$ up to type isomorphism.
 
 Remarkably, the simple rules of two-level type theory appear to model a form of
 generative two-stage compilation with dependent types. Comparing this system to
