@@ -329,7 +329,7 @@ In the following, whenever we introduce a type or term former, we always assume
 that it is natural with respect to substitution, i.e.\ all type and term formers
 have a corresponding substitution rule.
 
-\subsection{Morphisms, Liftings and Inclusions of Families}
+\subsection{Morphisms and Inclusions of Families}
 \label{sec:morphisms}
 
 In the rest of the paper we make use of categories equipped with possibly
@@ -352,31 +352,36 @@ existence of an invertible context morphism.
 Family morphisms are restrictions of so-called \emph{weak morphisms}
 \cite{dependentrightadjoints} (or \emph{pseudomorphisms}
 \cite{kaposi2019gluing}) of cwfs: a weak morphism which has the identity action
-on the base category is exactly a family morphism. A plain family morphism is
-still not too interesting, so we add more features.
+on the base category is exactly a family morphism.
 
-\begin{mydefinition}
-A \emph{lifting} is a family morphism which is bijective on terms. Note that
-we can drop the $\ext$-preservation condition from the specification of
-liftings, since it follows from the invertible action on terms.
-\end{mydefinition}
+\begin{mylemma} Every family morphism has invertible action on terms, i.e.\ there
+is an $F^{-1} : \Tm\,\Gamma\,(F\,A) \to \Tm\,\Gamma\,A$. \emph{Proof:} from the
+preservation of context extension by $F$, we know that $F$ is invertible on the
+zero De Bruijn index, so for $\q : \Tm\,(\Gamma \ext F\,A)\,(F (A[\p]))$, we
+have $F^{-1}\q : \Tm\,(\Gamma \ext F\,A)\,(A[\p])$, such that $F (F^{-1}\,\q) =
+\q$. If we have any $t : \Tm\,\Gamma\,(F\,A)$, we also have $(F^{-1}\q)[\id,\,t]
+: \Tm\,\Gamma\,A$, and this yields the inverse action $F^{-1}$ which acts on all
+terms. \qed
+\end{mylemma}
 
 \begin{notation}
-We write $\Lift : \Ty_0\,\Gamma \to \Ty_1\,\Gamma$ for the action of some lifting
-on types, $\up : \Tm_0\,\Gamma\,A \to \Tm_1\,\Gamma\,(\Lift\,A)$ for the action
-on terms, and $\down$ for the inverse action on terms.
+In the following, we will write $\Lift : \Ty_0\,\Gamma \to \Ty_1\,\Gamma$ for
+the action of some morphism on types, $\up : \Tm_0\,\Gamma\,A \to
+\Tm_1\,\Gamma\,(\Lift\,A)$ for the action on terms, and $\down$ for the inverse
+action on terms. We will also call the action on types \emph{type lifting}
+and the action on terms \emph{term lifting}.
 \end{notation}
 
-We may think about the relation between \emph{modalities} and liftings.  The
+We may think about the relation between \emph{modalities} and morphisms. The
 main difference is that we have no structural restrictions on variables and
 contexts. More concretely, every $\Lift$ is dependent right adjoint
 \cite{dependentrightadjoints} to the identity functor on the base category, as
 we have $\Tm\,(\msf{Id}\,\Gamma)\,A \simeq \Tm\,\Gamma\,(\Lift\,A)$. Hence,
-every lifting can be viewed as a degenerate modality.
+every morphism can be viewed as a degenerate modality.
 
 \paragraph{Two-level type theory}
 Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$) and a
-lifting between them. This corresponds to a basic version of \emph{two-level
+morphism between them. This corresponds to a basic version of \emph{two-level
   type theory} \cite{twolevel}. This theory can be interpreted as having ($\Ty_1$,
 $\Tm_1$) as a metaprogramming layer which can generate object-level programs in
 the ($\Ty_0$, $\Tm_0$) layer.
@@ -400,9 +405,9 @@ types are preserved by $\Lift$ up to type isomorphism.
 
 Remarkably, the simple rules of two-level type theory appear to model a form of
 generative two-stage compilation with dependent types. Comparing this system to
-e.g.\ BER MetaOCaml \cite{kiselyov14metaocaml}, we can relate $\Lift$ to $\mathsf{code}$, $\up$
-to the quasi-quotation operation $<\!\blank\!>$, and $\down$ to escape
-$\sim\!\blank$.
+e.g.\ BER MetaOCaml \cite{kiselyov14metaocaml}, we can relate $\Lift$ to
+$\mathsf{code}$, $\up$ to the quasi-quotation operation $<\!\blank\!>$, and
+$\down$ to escape $\sim\!\blank$.
 
 While the staging aspect could be subject of future research, we currently focus
 on ``sizing'' hierarchies instead of staging hierarchies. This means that we
@@ -410,7 +415,7 @@ want to eliminate from any family to any other family which is connected by
 a morphism.
 
 \begin{mydefinition}\label{def:inclusion}
-A \emph{family inclusion} is a lifting which preserves all type and term
+A \emph{family inclusion} is a family morphism which preserves all type and term
 formers. This assumes that every type former which is contained in the source
 family, is also contained in the target family.
 \end{mydefinition}
@@ -422,8 +427,8 @@ family, is also contained in the target family.
   & \Lift\,\Bool_0            && =&& \Bool_1\\
   & \up\true_0                && =&& \true_1
 \end{alignat*}
-In general, we can skip specifying preservation for $\down$, since it follows from $\up$ preservation
-equations.
+In general, we can skip specifying preservation for $\down$, since it follows
+from $\up$ preservation equations.
 
 Assume an inclusion from ($\Ty_0$, $\Tm_0$) to ($\Ty_1$, $\Tm_1$). Now, we can
 eliminate from $\Bool_0$ to $\Bool_1$. If we have some $b :
@@ -450,15 +455,15 @@ $\Ty_1$) is a family inclusion ($\Lift$, $\up$, $\down$) for which the following
 \end{mydefinition}
 
 A strict inclusion corresponds to Sterling's \emph{algebraic cumulativity}
-\cite{sterling2019algebraic}. The additional equations are a matter of convenience: they allow us
-to omit term liftings in informal syntax\footnote{In a proof assistant, often we would
-  still have to explicitly transport along the strict inclusion
-  equations.}. Most of the time we can also omit level annotations
-on term formers. For example, we have $\true_0 : \Tm_0\,\Gamma\,\Bool_0$,
-but also $\true_0 : \Tm_0\,\Gamma\,(\Lift\,\Bool_0)$, hence $\true_0 :
-\Tm_0\,\Gamma\,\Bool_1$. Moreover, $\true_0$ is definitionally equal to
-$\true_1$, since $\true_0 =\,\up\!\true_0 = \true_1$. Thus, using simply $\true$
-is fine whenever the family is clear from context.
+\cite{sterling2019algebraic}. The additional equations are a matter of
+convenience: they allow us to omit term liftings in informal syntax\footnote{In
+  a proof assistant, often we would still have to explicitly transport along the
+  strict inclusion equations.}. Most of the time we can also omit level
+annotations on term formers. For example, we have $\true_0 :
+\Tm_0\,\Gamma\,\Bool_0$, but also $\true_0 : \Tm_0\,\Gamma\,(\Lift\,\Bool_0)$,
+hence $\true_0 : \Tm_0\,\Gamma\,\Bool_1$. Moreover, $\true_0$ is definitionally
+equal to $\true_1$, since $\true_0 =\,\up\!\true_0 = \true_1$. Thus, using
+simply $\true$ is fine whenever the family is clear from context.
 
 The definitional equality of $\true_0$ and $\true_1$ is important; without it
 canonicity would fail, since $\true_0$, $\false_0$, $\true_1$ and $\false_1$
@@ -498,10 +503,6 @@ A relation $R : A \to A \to \Seti$ is \emph{well-founded} if $(a : A) \to
 \Acc\,R\,a$.
 \end{mydefinition}
 
-%% \begin{mylemma}
-%% Every well-founded relation is irreflexive \cite[Lemma 10.4.2]{hottbook}.
-%% \end{mylemma}
-
 \begin{mydefinition} A \emph{level structure} consists of the following components:
 \begin{alignat*}{3}
   & \Lvl                  &&: \Set0 \\
@@ -534,13 +535,14 @@ liftings, if they are clear from context.
 Our choice of level structures and diagrams is motivated by the following
 reasons. First, we do not need identity morphisms in levels, because they would
 be mapped to trivial liftings, which are not interesting in our setting. Second,
-we do not need proof-relevant level morphisms, since any parallel pair of family
-liftings gives rise to isomorphic types. Concretely, given $p : i < j$ and $q :
+we do not need proof-relevant level morphisms, since any parallel pair of
+morphisms gives rise to isomorphic types. Concretely, given $p : i < j$ and $q :
 i < j$ such that $p \neq q$, we have $\Tm_j\,\Gamma\,(\Lift\,p\,A) \simeq
 \Tm_i\,\Gamma\,A \simeq \Tm_j\,\Gamma\,(\Lift\,q\,A)$, and since $\Lift\,p\,A$
 and $\Lift\,q\,A$ are in the same family, we can internally prove them
-isomorphic using function types and identity types. That said, every construction
-in this paper would still work with inverse categories as level structures.
+isomorphic using function types and identity types. That said, every
+construction in this paper would still work with inverse categories as level
+structures.
 
 \subsection{Universes}
 \label{sec:universes}
@@ -548,8 +550,8 @@ in this paper would still work with inverse categories as level structures.
 At this point, we can talk about family diagrams, but no previously seen type
 former depends on levels in an interesting way. For example, $\Bool_i$ has the
 same canonical inhabitants as $\Bool_j$, for any $i$ and $j$. Universes
-introduce dependency on levels, by serving as classifiers for smaller families internally
-to larger families.
+introduce dependency on levels, by serving as classifiers for smaller families
+internally to larger families.
 
 \begin{mydefinition} A family diagram supports \emph{universe formation} if it supports the following:
 \begin{alignat*}{3}
