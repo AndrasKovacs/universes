@@ -1,0 +1,201 @@
+\begin{thebibliography}{10}
+
+\bibitem{twolevel}
+Danil Annenkov, Paolo Capriotti, Nicolai Kraus, and Christian Sattler.
+\newblock Two-level type theory and applications.
+\newblock {\em ArXiv e-prints}, may 2019.
+\newblock URL: \url{http://arxiv.org/abs/1705.03307}.
+
+\bibitem{awodey18natural}
+Steve Awodey.
+\newblock Natural models of homotopy type theory.
+\newblock {\em Math. Struct. Comput. Sci.}, 28(2):241--286, 2018.
+\newblock URL: \url{https://doi.org/10.1017/S0960129516000268}, \href
+  {http://dx.doi.org/10.1017/S0960129516000268}
+  {\path{doi:10.1017/S0960129516000268}}.
+
+\bibitem{dependentrightadjoints}
+Lars Birkedal, Ranald Clouston, Bassel Mannaa, Rasmus~Ejlers M{\o}gelberg,
+  Andrew~M. Pitts, and Bas Spitters.
+\newblock Modal dependent type theory and dependent right adjoints.
+\newblock {\em Math. Struct. Comput. Sci.}, 30(2):118--138, 2020.
+\newblock URL: \url{https://doi.org/10.1017/S0960129519000197}, \href
+  {http://dx.doi.org/10.1017/S0960129519000197}
+  {\path{doi:10.1017/S0960129519000197}}.
+
+\bibitem{cartmellthesis}
+John Cartmell.
+\newblock {\em Generalised algebraic theories and contextual categories}.
+\newblock PhD thesis, Oxford University, 1978.
+
+\bibitem{idrisdocs}
+The~Idris Community.
+\newblock Documentation for the idris language, 2021.
+\newblock URL: \url{http://docs.idris-lang.org/en/latest/index.html}.
+
+\bibitem{agdadocs}
+Agda developers.
+\newblock Agda documentation, 2021.
+\newblock URL: \url{https://agda.readthedocs.io/en/v2.6.1.3/}.
+
+\bibitem{leanmanual}
+Lean developers.
+\newblock Lean reference manual, version 3.3, 2021.
+\newblock URL: \url{https://leanprover.github.io/reference/lean_reference.pdf}.
+
+\bibitem{Dybjer96internaltype}
+Peter Dybjer.
+\newblock Internal type theory.
+\newblock In Stefano Berardi and Mario Coppo, editors, {\em Types for Proofs
+  and Programs, International Workshop TYPES'95, Torino, Italy, June 5-8, 1995,
+  Selected Papers}, volume 1158 of {\em Lecture Notes in Computer Science},
+  pages 120--134. Springer, 1995.
+\newblock URL: \url{https://doi.org/10.1007/3-540-61780-9\_66}, \href
+  {http://dx.doi.org/10.1007/3-540-61780-9\_66}
+  {\path{doi:10.1007/3-540-61780-9\_66}}.
+
+\bibitem{dybjer99finite}
+Peter Dybjer and Anton Setzer.
+\newblock A finite axiomatization of inductive-recursive definitions.
+\newblock In Jean{-}Yves Girard, editor, {\em Typed Lambda Calculi and
+  Applications, 4th International Conference, TLCA'99, L'Aquila, Italy, April
+  7-9, 1999, Proceedings}, volume 1581 of {\em Lecture Notes in Computer
+  Science}, pages 129--146. Springer, 1999.
+\newblock URL: \url{https://doi.org/10.1007/3-540-48959-2\_11}, \href
+  {http://dx.doi.org/10.1007/3-540-48959-2\_11}
+  {\path{doi:10.1007/3-540-48959-2\_11}}.
+
+\bibitem{indexedir}
+Peter Dybjer and Anton Setzer.
+\newblock Indexed induction-recursion.
+\newblock {\em J. Log. Algebraic Methods Program.}, 66(1):1--49, 2006.
+\newblock URL: \url{https://doi.org/10.1016/j.jlap.2005.07.001}, \href
+  {http://dx.doi.org/10.1016/j.jlap.2005.07.001}
+  {\path{doi:10.1016/j.jlap.2005.07.001}}.
+
+\bibitem{positiveir}
+Neil Ghani, Lorenzo Malatesta, and Fredrik~Nordvall Forsberg.
+\newblock Positive inductive-recursive definitions.
+\newblock {\em Log. Methods Comput. Sci.}, 11(1), 2015.
+\newblock URL: \url{https://doi.org/10.2168/LMCS-11(1:13)2015}, \href
+  {http://dx.doi.org/10.2168/LMCS-11(1:13)2015}
+  {\path{doi:10.2168/LMCS-11(1:13)2015}}.
+
+\bibitem{sprop}
+Ga{\"{e}}tan Gilbert, Jesper Cockx, Matthieu Sozeau, and Nicolas Tabareau.
+\newblock Definitional proof-irrelevance without {K}.
+\newblock {\em Proc. {ACM} Program. Lang.}, 3({POPL}):3:1--3:28, 2019.
+\newblock URL: \url{https://doi.org/10.1145/3290316}, \href
+  {http://dx.doi.org/10.1145/3290316} {\path{doi:10.1145/3290316}}.
+
+\bibitem{gratzer20multimodal}
+Daniel Gratzer, G.~A. Kavvos, Andreas Nuyts, and Lars Birkedal.
+\newblock Multimodal dependent type theory.
+\newblock In Holger Hermanns, Lijun Zhang, Naoki Kobayashi, and Dale Miller,
+  editors, {\em {LICS} '20: 35th Annual {ACM/IEEE} Symposium on Logic in
+  Computer Science, Saarbr{\"{u}}cken, Germany, July 8-11, 2020}, pages
+  492--506. {ACM}, 2020.
+\newblock URL: \url{https://doi.org/10.1145/3373718.3394736}, \href
+  {http://dx.doi.org/10.1145/3373718.3394736}
+  {\path{doi:10.1145/3373718.3394736}}.
+
+\bibitem{harperpollack}
+Robert Harper and Robert Pollack.
+\newblock Type checking with universes.
+\newblock {\em Theor. Comput. Sci.}, 89(1):107--136, 1991.
+\newblock URL: \url{https://doi.org/10.1016/0304-3975(90)90108-T}, \href
+  {http://dx.doi.org/10.1016/0304-3975(90)90108-T}
+  {\path{doi:10.1016/0304-3975(90)90108-T}}.
+
+\bibitem{kaposi2019gluing}
+Ambrus Kaposi, Simon Huber, and Christian Sattler.
+\newblock Gluing for type theory.
+\newblock In Herman Geuvers, editor, {\em 4th International Conference on
+  Formal Structures for Computation and Deduction, {FSCD} 2019, June 24-30,
+  2019, Dortmund, Germany}, volume 131 of {\em LIPIcs}, pages 25:1--25:19.
+  Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik, 2019.
+\newblock URL: \url{https://doi.org/10.4230/LIPIcs.FSCD.2019.25}, \href
+  {http://dx.doi.org/10.4230/LIPIcs.FSCD.2019.25}
+  {\path{doi:10.4230/LIPIcs.FSCD.2019.25}}.
+
+\bibitem{kiselyov14metaocaml}
+Oleg Kiselyov.
+\newblock The design and implementation of {BER} metaocaml - system
+  description.
+\newblock In Michael Codish and Eijiro Sumii, editors, {\em Functional and
+  Logic Programming - 12th International Symposium, {FLOPS} 2014, Kanazawa,
+  Japan, June 4-6, 2014. Proceedings}, volume 8475 of {\em Lecture Notes in
+  Computer Science}, pages 86--102. Springer, 2014.
+\newblock URL: \url{https://doi.org/10.1007/978-3-319-07151-0\_6}, \href
+  {http://dx.doi.org/10.1007/978-3-319-07151-0\_6}
+  {\path{doi:10.1007/978-3-319-07151-0\_6}}.
+
+\bibitem{luo2012notes}
+Zhaohui Luo.
+\newblock Notes on universes in type theory.
+\newblock {\em Lecture notes for a talk at Institute for Advanced Study,
+  Princeton (URL: http://www. cs. rhul. ac. uk/home/zhaohui/universes. pdf)},
+  page~16, 2012.
+
+\bibitem{martinlof73predicative}
+Per Martin-L{\"o}f.
+\newblock An intuitionistic theory of types: predicative part.
+\newblock In H.E. Rose and J.C. Shepherdson, editors, {\em Logic Colloquium
+  '73, Proceedings of the Logic Colloquium}, volume~80 of {\em Studies in Logic
+  and the Foundations of Mathematics}, pages 73--118. North-Holland, 1975.
+
+\bibitem{Palmgren98onuniverses}
+Erik Palmgren.
+\newblock On universes in type theory.
+\newblock In {\em Twenty-five years of constructive type theory}, volume~36 of
+  {\em Oxford Logic Guides}, page 191 – 204. Oxford University Press, 1998.
+
+\bibitem{setzer00mahlo}
+Anton Setzer.
+\newblock Extending martin-l{\"{o}}f type theory by one mahlo-universe.
+\newblock {\em Arch. Math. Log.}, 39(3):155--181, 2000.
+\newblock URL: \url{https://doi.org/10.1007/s001530050140}, \href
+  {http://dx.doi.org/10.1007/s001530050140} {\path{doi:10.1007/s001530050140}}.
+
+\bibitem{sterling2019algebraic}
+Jonathan Sterling.
+\newblock Algebraic type theory and universe hierarchies.
+\newblock {\em CoRR}, abs/1902.08848, 2019.
+\newblock URL: \url{http://arxiv.org/abs/1902.08848}, \href
+  {http://arxiv.org/abs/1902.08848} {\path{arXiv:1902.08848}}.
+
+\bibitem{timany18cumulative}
+Amin Timany and Matthieu Sozeau.
+\newblock Cumulative inductive types in coq.
+\newblock In H{\'{e}}l{\`{e}}ne Kirchner, editor, {\em 3rd International
+  Conference on Formal Structures for Computation and Deduction, {FSCD} 2018,
+  July 9-12, 2018, Oxford, {UK}}, volume 108 of {\em LIPIcs}, pages
+  29:1--29:16. Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik, 2018.
+\newblock URL: \url{https://doi.org/10.4230/LIPIcs.FSCD.2018.29}, \href
+  {http://dx.doi.org/10.4230/LIPIcs.FSCD.2018.29}
+  {\path{doi:10.4230/LIPIcs.FSCD.2018.29}}.
+
+\bibitem{hottbook}
+The {Univalent Foundations Program}.
+\newblock {\em Homotopy Type Theory: Univalent Foundations of Mathematics}.
+\newblock \url{https://homotopytypetheory.org/book}, Institute for Advanced
+  Study, 2013.
+
+\bibitem{principia}
+A.~N. Whitehead and B.~Russell.
+\newblock Principia mathematica.
+\newblock {\em Revue de M\'etaphysique et de Morale}, 19(2):19--19, 1911.
+
+\bibitem{ziliani15unification}
+Beta Ziliani and Matthieu Sozeau.
+\newblock A unification algorithm for coq featuring universe polymorphism and
+  overloading.
+\newblock In Kathleen Fisher and John~H. Reppy, editors, {\em Proceedings of
+  the 20th {ACM} {SIGPLAN} International Conference on Functional Programming,
+  {ICFP} 2015, Vancouver, BC, Canada, September 1-3, 2015}, pages 179--191.
+  {ACM}, 2015.
+\newblock URL: \url{https://doi.org/10.1145/2784731.2784751}, \href
+  {http://dx.doi.org/10.1145/2784731.2784751}
+  {\path{doi:10.1145/2784731.2784751}}.
+
+\end{thebibliography}
