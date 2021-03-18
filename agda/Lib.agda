@@ -5,7 +5,7 @@ open import Data.Unit using (⊤; tt) public
 open import Data.Empty using (⊥; ⊥-elim) public
 open import Data.Product renaming (proj₁ to ₁; proj₂ to ₂) public
 open import Data.Sum using (_⊎_; inj₁; inj₂) public
-open import Function hiding (id; _∘_) public
+open import Function hiding (id; _∘_; _⇔_) public
 open import Induction.WellFounded public
 open import Relation.Binary public
 open import Relation.Binary.PropositionalEquality
