@@ -160,7 +160,7 @@ lower {p = p}{A} t γ = coe (ElLift (p γ) (A γ)) (t γ)
 
 -- Universes
 Univ : ∀ {Γ} i j → Lt {Γ} i j → Ty Γ j
-Univ {Γ} i j p = λ γ → U' (p γ)
+Univ {Γ} i j p = λ γ → U' {j γ}{_}{i γ} (p γ)
 
 RussellUniv : ∀ {Γ i j p} → Tm Γ (Univ {Γ} i j p) ≡ Ty Γ i
 RussellUniv {Γ}{i}{j} = (λ f → ∀ x → f x) & ext λ γ → U<-compute

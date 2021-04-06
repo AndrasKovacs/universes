@@ -204,9 +204,9 @@ systems in this paper.
   levels is mapped to a lifting operation on terms and types. By varying the
   preservation properties of lifting operations, we can describe a range of
   stratification features, from two-level type theory to cumulative universes.
-\item We use induction-recursion to model the mentioned theories. We model
-  the strongest formulations for lifting and universes, namely cumulative
-  universes with Russell-style type decoding.
+\item In Section \ref{sec:semantics} we use induction-recursion to model the mentioned theories. We
+  model the strongest formulations for lifting and universes, namely cumulative universes with
+  Russell-style type decoding.
 \item In Section \ref{sec:ttfl} we describe type theories with internal types
   for levels and level morphisms, and extend the previous inductive-recursive
   semantics to cover these as well. Here, we can additionally represent various
@@ -223,21 +223,18 @@ reflection), and instead focus on the key points.
 
 We work in a Martin-Löf type theory which has the following features.
 \begin{itemize}
-  \item Two universes named $\Set0$ and $\Set1$, where $\Set0$ supports
-    inductive-recursive types (IR) as specified by Dybjer and Setzer
-    \cite{dybjer99finite}. The $\Set1$ universe is not essential and we only use
-    it as a convenience feature, in this paper and in the Agda formalization. We
-    may omit the universe indices if they can be inferred or if we work over
-    arbitrary indices.
+  \item Two universes named $\Set0$ and $\Set1$, where $\Set0$ supports inductive-recursive types
+    (IR) as specified by Dybjer and Setzer \cite{dybjer99finite}. We may omit the universe indices
+    if they can be inferred or if we work over arbitrary indices.
   \item Function extensionality and uniqueness of identity proofs
     (UIP). Additionally, we assume equality reflection in this paper, thus
     working in extensional type theory, to avoid noise from equality transports.
-  \item We write function types as $(x : A)\to B$ with $\lambda\,x.\,t$
-    inhabitants, and $\Sigma$-types as $(x : A) \times B$, with pairing as
-    $(t,\, u)$. We have $\top$ as the unit type with inhabitant $\tt$, $\bot$ as
-    the empty type, and $\Bool$ with $\true$ and $\false$
-    inhabitants. Propositional identity is written as $t = u$ (coinciding with
-    definitional equality).
+  \item We write function types as $(x : A)\to B$ with $\lambda\,x.\,t$ inhabitants. We may group
+    multiple arguments with the same type, as in $(x\,y : A) \to B$.  We have $\Sigma$-types as $(x :
+    A) \times B$, with pairing as $(t,\, u)$.  We have $\top$ as the unit type with inhabitant
+    $\tt$, $\bot$ as the empty type, and $\Bool$ with $\true$ and $\false$
+    inhabitants. Propositional identity is written as $t = u$ (coinciding with definitional
+    equality).
   \item We occasionally use $\{x : A\} \to B$ for an Agda-like notation for
     function types with implicit arguments. We usually omit implicit
     applications but may explicitly write them as $t\,\{u\}$.  We may omit
@@ -289,7 +286,7 @@ A \emph{category with family} (cwf) \cite{Dybjer96internaltype} consists of the 
 
 \begin{itemize}
 \item By going right-to-left along the isomorphism, we recover \emph{substitution extension}
-      $\blank,\blank : (\sigma : \Sub\,\Gamma\,\Delta) \to \Tm\,\Gamma\,(A[\sigma])$. This means
+      $\blank,\blank : (\sigma : \Sub\,\Gamma\,\Delta) \to \Tm\,\Gamma\,(A[\sigma]) \to \Sub\,\Gamma\,(\Delta\ext A)$. This means
       that starting from $\epsilon$ or the identity substitution $\id$, we can iterate $\blank,\blank$
       to build substitutions as lists of terms.
 \item By going left-to-right, and starting from $\id : \Sub\,(\Gamma\ext A)\,(\Gamma\ext A)$, we recover
@@ -342,7 +339,7 @@ together in typing contexts. In this subsection we describe several ways of
 crossing between families.
 
 \begin{mydefinition}
-A \emph{family morphism} $F$ between ($\Tm_0$, $\Ty_0$) and ($\Tm_1$, $\Ty_1$)
+A \emph{family morphism} $F$ between ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$)
 families consists of natural transformations mapping types to types and terms to
 terms, which preserves context extensions up to context isomorphism, i.e.\ we
 have that $(\Gamma \ext F\,A) \simeq (\Gamma \ext A)$, where $\simeq$ denotes
@@ -355,14 +352,15 @@ Family morphisms are restrictions of so-called \emph{weak morphisms}
 on the base category is exactly a family morphism.
 
 \begin{mylemma} Every family morphism has invertible action on terms, i.e.\ there
-is an $F^{-1} : \Tm\,\Gamma\,(F\,A) \to \Tm\,\Gamma\,A$. \emph{Proof:} from the
-preservation of context extension by $F$, we know that $F$ is invertible on the
-zero De Bruijn index, so for $\q : \Tm\,(\Gamma \ext F\,A)\,(F (A[\p]))$, we
-have $F^{-1}\q : \Tm\,(\Gamma \ext F\,A)\,(A[\p])$, such that $F (F^{-1}\,\q) =
-\q$. If we have any $t : \Tm\,\Gamma\,(F\,A)$, we also have $(F^{-1}\q)[\id,\,t]
-: \Tm\,\Gamma\,A$, and this yields the inverse action $F^{-1}$ which acts on all
-terms. \qed
+is an $F^{-1} : \Tm\,\Gamma\,(F\,A) \to \Tm\,\Gamma\,A$.
 \end{mylemma}
+\begin{proof} From the
+preservation of context extension by $F$, we know that $F$ is invertible on the zero De Bruijn
+index, so for $\q : \Tm\,(\Gamma \ext F\,A)\,(F (A[\p]))$, we have $F^{-1}\q : \Tm\,(\Gamma \ext
+F\,A)\,(A[\p])$, such that $F (F^{-1}\,\q) = \q$. If we have any $t : \Tm\,\Gamma\,(F\,A)$, we also
+have $(F^{-1}\q)[\id,\,t] : \Tm\,\Gamma\,A$, and this yields the inverse action $F^{-1}$ which acts
+on all terms.
+\end{proof}
 
 \begin{notation}
 In the following, we will write $\Lift : \Ty_0\,\Gamma \to \Ty_1\,\Gamma$ for
@@ -379,18 +377,14 @@ and contexts. More concretely, every $\Lift$ is dependent right adjoint
 we have $\Tm\,(\msf{Id}\,\Gamma)\,A \simeq \Tm\,\Gamma\,(\Lift\,A)$. Hence,
 every morphism can be viewed as a degenerate modality.
 
-\paragraph{Two-level type theory}
-Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$) and a
-morphism between them. This corresponds to a basic version of \emph{two-level
-  type theory} \cite{twolevel}. This theory can be interpreted as having ($\Ty_1$,
-$\Tm_1$) as a metaprogramming layer which can generate object-level programs in
-the ($\Ty_0$, $\Tm_0$) layer.
-
-Lifted types correspond to types of object-level expressions; for example,
-$\Bool_0 : \Ty_0\,\Gamma$ is the object-level type of Booleans, while
-$\Lift\,\Bool_0$ is the meta-level type of $\Bool_0$-expressions, and $\Bool_1 :
-\Ty_1\,\Gamma$ is the type of meta-level Booleans. It is possible to compute a
-$\Bool_0$ from a $\Bool_1$. Given $b : \Tm_1\,\Gamma\,\Bool_1$, we can construct
+Assume family structures ($\Ty_0$, $\Tm_0$) and ($\Ty_1$, $\Tm_1$) and a morphism between them. This
+corresponds to a basic version of \emph{two-level type theory} \cite{twolevel}. This theory can be
+interpreted as having ($\Ty_1$, $\Tm_1$) as a metaprogramming layer which can generate object-level
+programs in the ($\Ty_0$, $\Tm_0$) layer. Lifted types correspond to types of object-level
+expressions; for example, $\Bool_0 : \Ty_0\,\Gamma$ is the object-level type of Booleans, while
+$\Lift\,\Bool_0$ is the meta-level type of $\Bool_0$-expressions, and $\Bool_1 : \Ty_1\,\Gamma$ is
+the type of meta-level Booleans. It is possible to compute a $\Bool_0$ from a $\Bool_1$. Given $b :
+\Tm_1\,\Gamma\,\Bool_1$, we can construct
 $\down(\mathsf{if}\,b\,\mathsf{then}\up\!\true_0\,\mathsf{else}\up\!\false_0) :
 \Tm_0\,\Gamma\,\Bool_0$.
 
@@ -399,14 +393,13 @@ the input, but there is no elimination rule for $\Lift\,\Bool_0$ in
 $\Ty_1$. Conceptually, terms of $\Lift\,\Bool_0$ are \emph{expressions}, so they
 are not necessarily $\true$ or $\false$, they can also be variables or neutral
 expressions, so the usual Boolean elimination is not justified for them. In
-general, the setup ensures that we can eliminate from positive types in $\Ty_1$
+general, the setup ensures that we can map from positive types in $\Ty_1$
 to their counterparts in $\Ty_0$, but not the other way around, while negative
 types are preserved by $\Lift$ up to type isomorphism.
 
-Remarkably, the simple rules of two-level type theory appear to model a form of
-generative two-stage compilation with dependent types. Comparing this system to
-e.g.\ BER MetaOCaml \cite{kiselyov14metaocaml}, we can relate $\Lift$ to
-$\mathsf{code}$, $\up$ to the quasi-quotation operation $<\!\blank\!>$, and
+The rules of two-level type theory appear to model a form of generative two-stage compilation with
+dependent types. Comparing this system to e.g.\ BER MetaOCaml \cite{kiselyov14metaocaml}, we can
+relate $\Lift$ to $\mathsf{code}$, $\up$ to the quasi-quotation operation $<\!\blank\!>$, and
 $\down$ to escape $\sim\!\blank$.
 
 While the staging aspect could be subject of future research, we currently focus
@@ -445,8 +438,8 @@ two families: every type former of the smaller family is included in the larger
 family, with the same elimination rules.
 
 \begin{mydefinition}\label{def:strict_inclusion}
-A \emph{strict family inclusion} between ($\Tm_0$, $\Ty_0$) and ($\Tm_1$,
-$\Ty_1$) is a family inclusion ($\Lift$, $\up$, $\down$) for which the following equations hold:
+A \emph{strict family inclusion} between ($\Ty_0$, $\Tm_0$) and ($\Ty_1$,
+$\Tm_1$) is a family inclusion ($\Lift$, $\up$, $\down$) for which the following equations hold:
 \begin{alignat}{2}
   & (\Gamma \ext \Lift\,A) &&= (\Gamma \ext A)     \label{eq:cumcon}    \\
   & \Tm_1\,\Gamma\,(\Lift\,A) &&= \Tm_0\,\Gamma\,A  \label{eq:cumtm}     \\
@@ -484,7 +477,7 @@ family diagrams. First, some preliminary definitions.
 \begin{mydefinition} The \emph{accessibility predicate} on relations is defined by the following
 inductive rules:
 \begin{alignat*}{3}
-  & \Acc : \{A : \Seti\}(R : A \to A \to \Seti) \to A \to \Seti \\
+  & \Acc : \{A : \Seti\}\to(R : A \to A \to \Seti) \to A \to \Seti \\
   & \acc : \{a : A\} \to ((\mi{a'} : A) \to R\,\mi{a'}\,a \to \Acc\,R\,\mi{a'}) \to \Acc\,R\,a
 \end{alignat*}
 \end{mydefinition}
@@ -532,17 +525,14 @@ Sometimes we omit some of the $i$, $j$, $p$ annotations from type and term
 liftings, if they are clear from context.
 \end{notation}
 
-Our choice of level structures and diagrams is motivated by the following
-reasons. First, we do not need identity morphisms in levels, because they would
-be mapped to trivial liftings, which are not interesting in our setting. Second,
-we do not need proof-relevant level morphisms, since any parallel pair of
-morphisms gives rise to isomorphic types. Concretely, given $p : i < j$ and $q :
-i < j$ such that $p \neq q$, we have $\Tm_j\,\Gamma\,(\Lift\,p\,A) \simeq
-\Tm_i\,\Gamma\,A \simeq \Tm_j\,\Gamma\,(\Lift\,q\,A)$, and since $\Lift\,p\,A$
-and $\Lift\,q\,A$ are in the same family, we can internally prove them
-isomorphic using function types and identity types. That said, every
-construction in this paper would still work with inverse categories as level
-structures.
+Our choice of level structures and diagrams is motivated by the following.  First, we do not need
+identity morphisms in levels, because they would be mapped to trivial liftings, which are not
+interesting in our setting. Second, we do not need proof-relevant level morphisms, since any
+parallel pair of morphisms gives rise to isomorphic types. Concretely, given $p : i < j$ and $q : i
+< j$ such that $p \neq q$, we have $\Tm_j\,\Gamma\,(\Lift\,p\,A) \simeq \Tm_i\,\Gamma\,A \simeq
+\Tm_j\,\Gamma\,(\Lift\,q\,A)$, and since $\Lift\,p\,A$ and $\Lift\,q\,A$ are in the same family, we
+can internally prove them isomorphic using function types and identity types. That said, every
+construction in this paper would still work with inverse categories as level structures.
 
 \subsection{Universes}
 \label{sec:universes}
@@ -649,9 +639,7 @@ definition which corresponds more directly to TTGU structure.
 
 \begin{mydefinition}[IR codes]
   Assume $i : \Lvl$ and $f : (j : \Lvl) \to j < i \to \Set0$. We define $\uir$
-  and $\elir$ by simultaneous IR. For basic type formers, below we only include
-  codes for function types, the empty type, and $\Bool$; other type formers are
-  straightforward to add (and we do have more in the Agda formalization).
+  and $\elir$ by simultaneous IR:
 \begin{alignat*}{5}
   & \uir   &&: \Set0
      && \rlap{$\elir : \uir \to \Set0$} \\
@@ -665,6 +653,9 @@ definition which corresponds more directly to TTGU structure.
      && \elir\,\Bool'     &&= \Bool
 \end{alignat*}
 \end{mydefinition}
+We use the prime accents ($'$) to disambiguate IR codes from type formers in TTGU or the metatheory.
+For basic type formers, we only include codes for function types, the empty type, and $\Bool$.
+Other type formers are straightforward to add (and we do have more in the Agda formalization).
 
 \begin{notation}
 We may write $\uir_{i\,f}$ and $\elir_{i\,f}$ in order to make parameters explicit.
@@ -677,7 +668,7 @@ sets in $f$ by the way of $\U'$. Most importantly, this operation can be
 transfinitely iterated. We first define universes for initial segments of
 $\Lvl$, by induction on the accessibility of levels:
 \begin{alignat*}{3}
-  & \ult\,: (i : \Lvl)\{p : \Acc\,<\,i\} \to (j : \Lvl) \to j < i \to \Set0 \\
+  & \ult\,: (i : \Lvl)\{p : \Acc\,(\blank\!<\!\blank)\,i\} \to (j : \Lvl) \to j < i \to \Set0 \\
   & \ult\,i\,\{\acc\,f\}\,j\,p = \uir_{j\,(\ult\,j\,\{f\,j\,p\})}
 \end{alignat*}
 
@@ -694,19 +685,19 @@ its decoding function.
 
 \begin{mylemma}\label{lem:ucomp}
 Assuming $p : i < j$, we have the computation rule $\ult\,j\,p = \U\,j$. Proof: we
-may assume that any witness for $\Acc\,<\,i$ is of the form $\acc\,f$ for
+may assume that any witness for $\Acc\,(\blank\!<\!\blank)\,i$ is of the form $\acc\,f$ for
 some $f$. Then the equation becomes $\uir_{j\,(\ult\,j\,\{f\,j\,p\})} =
 \uir_{j\,(\ult\,j\,\{\mathsf{<\!wf}\,j\})}$, but by Lemma \ref{lem:accprop}
 the $f\,j\,p$ and $\mathsf{<\!wf}\,j$ witnesses are equal. \qed
 \end{mylemma}
 
 \begin{mydefinition}[Semantic $\Lift$]
-We define by induction on $\uir$ a function with type $(p : i < j)(A : \U\,i)
+We define by induction on $\uir$ a function with type $(p : i < j)\to(A : \U\,i)
 \to (A' : \U\,j)\times(\El\,A' = \El\,A)$. However, for the sake of clarity, we
 present this here as two (mutual) functions:
 \begin{alignat*}{3}
   &\Lift\,      &&: (p : i < j) \to \U\,i \to \U\,j\\
-  &\msf{ElLift} &&: (p : i < j)(A : \U\,i) \to \El\,(\Lift\,A) = \El\,A
+  &\msf{ElLift} &&: (p : i < j)\to(A : \U\,i) \to \El\,(\Lift\,A) = \El\,A
 \end{alignat*}
 Let us look at $\Lift$ first:
 \begin{alignat*}{3}
@@ -715,10 +706,9 @@ Let us look at $\Lift$ first:
   &\Lift\,p\,\bot'          &&= \bot'\\
   &\Lift\,p\,\Bool'         &&= \Bool'
 \end{alignat*}
-Above, the $\Pi'$ definition is well-typed by $\msf{ElLift}\,p\,A$. For the
-proof of $\msf{ElLift}$, the only interesting case is $\U'$. Here, we need
-show $\ult\,j\,k\,(p \circ q) = \ult\,i\,k\,q$, but by Lemma
-\ref{lem:ucomp} both sides are $\U\,k$. \qed
+Above, the $\Pi'$ definition is well-typed by $\msf{ElLift}\,p\,A$. For the proof of $\msf{ElLift}$,
+the only interesting case is $\U'$. Here, we need to show $\ult\,j\,k\,(p \circ q) = \ult\,i\,k\,q$,
+but by Lemma \ref{lem:ucomp} both sides are $\U\,k$.
 \end{mydefinition}
 
 \begin{mylemma}\label{lem:liftprop} Properties of $\Lift$:
@@ -739,8 +729,8 @@ definitions, we use \textbf{bold} font to refer to TTGU components.
 \end{notation}
 
 \begin{mydefinition}[Base category]
-This is simply the category of sets and functions in $\Set0$, i.e.\ $\bm{\Con} = \Set0$,
-$\bm{\Sub}\,\Gamma\,\Delta = \Gamma \to \Delta$, and the terminal object is $\top$.
+The base category is simply the category of sets and functions in $\Set0$, i.e.\ $\bm{\Con} =
+\Set0$, $\bm{\Sub}\,\Gamma\,\Delta = \Gamma \to \Delta$, and the terminal object is $\top$.
 \end{mydefinition}
 
 \begin{mydefinition}[Family diagram]
@@ -748,8 +738,8 @@ We map $i : \Lvl$ to a family structure as follows.
 \begin{alignat*}{5}
   &\bm{\Ty}_i\,\Gamma = \Gamma \to \U\,i \hspace{2em} \bm{\Tm}_i\,\Gamma\,A = (\gamma : \Gamma) \to \El\,(A\,\gamma)
 \end{alignat*}
-Type and term substitution are given by composition with some $\sigma : \Gamma
-\to \Delta$ function. Comprehension structure is given by $\Gamma \bm{\ext} A =
+Type and term substitution are given by composition with some function $\sigma : \Gamma
+\to \Delta$. Comprehension structure is given by $\Gamma \bm{\ext} A =
 (\gamma : \Gamma) \times \El\,(A\,\gamma)$. Type lifting along $p : i < j$ is
 as follows:
 \begin{alignat*}{5}
@@ -762,7 +752,7 @@ $\bm{\Tm}_j\,\Gamma\,(\bm{\Lift}_{i}^{j}p\,A) = \bm{\Tm}_i\,\Gamma\,A$. Thus, we
 can just define term lifting as $\bm{\up}_{i}^{j}\!p\,t = t$ and
 $\bm{\down}_{i}^{j}\!p\,t = t$. Basic type formers are as follows.
 \begin{alignat*}{5}
-  & \bm{\Pi}\,A\,B = \lambda\,\gamma.\,\Pi'\,(A\,\Gamma)\,(\lambda\,\alpha.\,B\,(\gamma,\,\alpha))
+  & \bm{\Pi}\,A\,B = \lambda\,\gamma.\,\Pi'\,(A\,\gamma)\,(\lambda\,\alpha.\,B\,(\gamma,\,\alpha))
   & \hspace{2em}\bm{\bot}_i = \lambda\,\gamma.\,\bot'
   & \hspace{2em}\bm{\Bool}_i = \lambda\,\gamma.\,\Bool'
 \end{alignat*}
@@ -909,7 +899,7 @@ such that it can be also represented using TTDL type formers.
   $\bm{\Tm}\,\Gamma\,A = \bm{\Tm}\,\Gamma\,(\bm{\Lift}\,p\,A)$ and $\Gamma \bm{\ext}
   A = \Gamma \bm{\ext} (\bm{\Lift}\,p\,A)$ follow from the $\msf{ElLift}$
   equality, and term lifting is the identity function.
-\item We define $\bm{\U}\,i\,j\,p = \lambda\,\gamma.\,\U'\,(p\,\gamma)$. Again,
+\item We define $\bm{\U}\,i\,j\,p = \lambda\,\gamma.\,\U'\,(i\,\gamma)\,(p\,\gamma)$. Again,
   we have $\bm{\Tm}\,\Gamma\,(\U\,i\,j\,p) = \bm{\Ty}\,\Gamma\,i$ by Lemma \ref{lem:ucomp},
   and $\bm{\El}$ and $\bm{\Code}$ are identity functions.
 \item Basic type formers are interpreted using $\uir$ codes. Preservation of
@@ -1066,7 +1056,7 @@ way to remedy the inconsistency of the previous version of the theory (which
 assumed type-in-type). Harper and Pollack described universe inference with
 level assignments and also a form of level polymorphism \cite{harperpollack}.
 Sterling \cite{sterling2019algebraic} gave an algebraic specification much like
-ours for a type theory with countable cumulative universes, and prove canonicity
+ours for a type theory with countable cumulative universes, and proved canonicity
 for it.
 
 There have been proposals for strengthening universes with various closure

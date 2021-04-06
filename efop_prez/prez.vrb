@@ -1,0 +1,22 @@
+\frametitle{Implementation}
+
+We define a family of type theories with general universe features.
+\vspace{1em}
+
+We prove all of them consistent by reducing all fancy features to
+a single previously known feature, called \textbf{induction-recursion}.
+\vspace{1em}
+
+Induction-recursion is a type-theoretic analogue of assuming \textbf{Mahlo cardinals} in set theory.
+
+\begin{verbatim}
+   Univ   : Set
+   Nat    : Univ
+   Π      : (A : Univ) → (Interp Univ → Univ) → Univ
+
+   Interp : Univ → Set
+   Interp Nat     = ℕ
+   Interp (Π A B) = (x : Interp A) → Interp (B x)
+\end{verbatim}
+
+
