@@ -28,80 +28,80 @@
 
 %% --------------------------------------------------------------------------------
 
-\title{Universes In Type Theory}
-\date{April 8, 2021, EFOP Workshop}
-\author{\normalsize{\vspace{-1em}\textbf{András Kovács}\footnote{The author was supported by the European Union, co-financed by the
-European Social Fund (EFOP-3.6.3-VEKOP-16-2017-00002).\vspace{0.5em}}}}
+\title{Univerzumok Típuselméletben}
+\date{2021 április 8., EFOP Workshop}
+\author{\normalsize{\vspace{-1em}\textbf{Kovács András}\footnote{A szerzőt az Európai Unió támogatta, közös finanszírozásban az Európai Szociális Alappal (EFOP-3.6.3-VEKOP-16-2017-00002).\vspace{0.5em}}}}
 %% \institute{Eötvös Loránd University, Budapest}
 \begin{document}
 \maketitle
 
 %% ------------------------------------------------------------
 
-\begin{frame}{Russell's paradox, or size issues}
+\begin{frame}{Russell paradoxon és méret-problémák}
 
-There is no set $S$ in a consistent set theory such that $x \in S$ iff $x \notin x$.
+Nincs olyan $S$ halmaz egy konzisztens halmazelméletben, hogy $x \in S$ pontosan akkor, ha $x \notin
+x$.
 \vspace{1em}
 
-Alternate formulations:
+Alternatív fogalmazás:
 \begin{itemize}
-  \item Barber's paradox
-  \item No set of all sets
+  \item Borbély paradoxon
+  \item Összes halmaz halmaza
 \end{itemize}
 \vspace{1em}
 
-Related:
+Kapcsolódó:
 \begin{itemize}
-  \item Real numbers are uncountable
-  \item Gödel's first incompleteness theorem
-  \item Undecidability of halting
+  \item Valós számok nem megszámlálhatóak
+  \item Gödel első nem-teljességi tétele
+  \item Megállási probléma
 \end{itemize}
 \vspace{1em}
 
-{\footnotesize (All instances of \href{https://arxiv.org/pdf/math/0305282.pdf}{Lawvere's fixed point theorem)}}
+{\footnotesize (Általánosításuk: \href{https://arxiv.org/pdf/math/0305282.pdf}{Lawvere fixpont tétele)}}
 \end{frame}
 
 %% ------------------------------------------------------------
 
-\begin{frame}{Solution with universes}
+\begin{frame}{Megoldás univerzumokkal}
 
-Solving Russell's paradox: set comprehension can only define a \textbf{subset} of a set.
+Csak \textbf{létező halmaz részhalmazát} definiálhatjuk logikai formulával.
 \vspace{1em}
 
-But sometimes we still want to quantify over \textbf{all sets} of
-Zermelo-Fraenkel set theory.
+De olykor szeretnénk kvantifikálni egy halmazelmélet \textbf{minden halmaza}
+fölött.
 \vspace{1em}
 
-\textbf{Universe:} a set which includes every ZF set.
+\textbf{Univerzum:} halmaz, ami tartalmazza egy halmazelmélet (pl. ZF) összes halmazát.
 \vspace{1em}
 
-Gödel: there is no universe inside ZF.
+Gödel, Russell: ZF-ben nincs univerzum, ami az összes ZF halmazt tartalmazza.
 \vspace{1em}
 
-We can assume more universes if we want to quantify over more sets.
+Új univerzumokat axiómaként kell felvenni.
 \end{frame}
 
 
-\begin{frame}[fragile]{Universes in type theory}
+\begin{frame}[fragile]{Típuselméletben}
 
-Type theories:
+Típuselméletek:
 \begin{itemize}
-  \item Alternative to set theory as mathematical foundation.
-  \item Used in most general-purpose theorem provers.
-  \item Can be used for proving and programming at the same time.
+  \item A halmazelméletek alternatívái.
+  \item Tételbizonyító-rendszerek gyakori alapja.
+  \item Bizonyításra és programozásra egyszerre alkalmas.
 \end{itemize}
 
-Universes come up in type theories as well.
+Formális vs. informális univerzum kezelés.
 \vspace{1em}
 
-Every theorem prover has different universe-related features.
+Létező bizonyító-rendszerekben: univerzum megvalósítások sokasága kisebb-nagyobb eltérésekkel.
 \vspace{1em}
 
-We want to give a general semantics covering many different features.
+Szeretnénk ezeket lefedni egy általános szemantikával.
 
 \end{frame}
 
-\begin{frame}[fragile]{Example}
+\begin{frame}[fragile]{Példa}
 
 Agda:
 \begin{verbatim}
@@ -112,31 +112,32 @@ Agda:
   (Set₀ → Bool) : Set₁
 \end{verbatim}
 
-Identity function at all small sets:
+Identitás függvény minden ``kis'' halmazon:
 \begin{verbatim}
   id : (A : Set₀) → A → A
   id A x = x
 \end{verbatim}
 
-We have $\mathsf{Set_i} : \mathsf{Set_{i + 1}}$ for all $i$.
+Minden $i$-re $\mathsf{Set_i} : \mathsf{Set_{i + 1}}$.
 \vspace{1em}
 
-Assuming $\mathsf{Set_i} : \mathsf{Set_{i + 1}}$ implies contradiction (by Russell-like argument).
+Ellentmondás lenne: $\mathsf{Set_i} : \mathsf{Set_{i}}$.
 \vspace{1em}
 
 \end{frame}
 
-\begin{frame}[fragile]{Extensions}
+\begin{frame}[fragile]{Kiterjesztések}
 
-The basic system can be tedious:
+Az alap rendszer vesződséges tud lenni:
 \begin{verbatim}
   id₀ : (A : Set₀) → A → A
   id₁ : (A : Set₁) → A → A
   ...
 \end{verbatim}
 
-In Coq/Agda/Lean, various extra features are used.
-Example: universe polymorphism in Agda:
+
+Coq/Agda/Lean-ben extra feature-ök vannak.
+Pl. univerzum polimorfizmus Agda-ban:
 \begin{verbatim}
   id : (l : Level)(A : Set l) → A → A
   id l A x = x
@@ -145,63 +146,63 @@ Example: universe polymorphism in Agda:
 
 \end{frame}
 
-\begin{frame}[fragile]{Design choices and variations}
+\begin{frame}[fragile]{Variációk}
 
-\textbf{How many universes?} Agda/Coq: countably many.
+\textbf{Mennyi univerzum?} Agda/Coq: megszámlálható.
 \vspace{1em}
 
-\textbf{Are universes totally ordered?} Agda/Coq: yes.
+\textbf{Univerzumok teljesen rendzettek?} Agda/Coq: igen.
 \vspace{1em}
 
-\textbf{What kind of level polymorphism?}. Coq: bounded polymorphism. Agda: no
-bounds allowed. Bounded example:
+\textbf{Milyen univerzum polimorfizmus?}. Coq: korlátos polimorfizmus. Agda: nincsenek
+korlátok. Példa korláttal:
 \begin{verbatim}
   myId : (i : ℕ) → i < 3 → (A : Set i) → A → A
   myId i p A x = x
 \end{verbatim}
 
-\textbf{What kind of operations are available on levels?} Agda is more liberal than Coq. Example:
+\textbf{Milyen műveletek vannak univerzum-szinteken?} Az Agda liberálisabb a Coq-nál:
 \begin{verbatim}
   ℕtoLevel : ℕ → Level
 \end{verbatim}
 
 
-\textbf{Are universes cumulative} Agda: no. Coq: yes. Cumulativity: whenever \texttt{A : Set i}, we also have \texttt{A : Set (i + 1)}.
+\textbf{Kumulativitás.} Agda: nincs. Coq: van. Kumulativitás: ha \texttt{A : Set i}, akkor \texttt{A
+  : Set (i + 1)}.
 
 \end{frame}
 
-\begin{frame}{Research goals}
+\begin{frame}{Kutatási célok}
 
-We want to know that each point in the design space makes sense.
+Szeretnénk belátni, hogy a különféle variációk mind jól viselkednek.
 \vspace{1em}
 
-Making sense:
+Jól viselkedés:
 \begin{itemize}
-  \item Logical consistency.
-  \item Is the type theory a proper programming language? Programs should compute to values
-        and not get randomly stuck.
-  \item Is proof checking decidable? (Not covered in current work).
+  \item Logikai konzisztencia.
+  \item Igaz, hogy a típuselmélet egy programozási nyelv? Azaz: programok le kell, hogy
+        fussanak elakadás nélkül. (Nincs jelenlegi munkában)
+  \item Eldönthető a bizonyítások validálása? (Nincs jelenlegi munkában)
 \end{itemize}
 
-Approach: use generic framework to cover as many features/variations as
-possible. Prove that everything in the framework is sensible.
-
+Egy általános rendszert használunk, ahol sok feature modellezhető, és
+egyszerre bizonyítjuk az összes konzisztenciáját.
 
 \end{frame}
 
 
-\begin{frame}[fragile]{Features covered by the framework}
+\begin{frame}[fragile]{Amit a rendszerünk lefed}
 
-Universe levels may come from \textbf{any well-ordered set}, even transfinite:
+Univerzum-szintek \textbf{bármilyen jól-rendezett halmazt} alkothatnak.
 \begin{verbatim}
   Set i : Set (i + 1) : ... : Set ω : Set (ω + 1) : ...
 \end{verbatim}
-\textbf{Quantification over levels}, \textbf{arbitrary computation on levels}.
+\textbf{Szintek fölötti kvantifikáció}, \textbf{tetszőleges számítások szinteken}.
 \begin{verbatim}
    myId : (i : ℕ) → (j : ℕ) → (A : Set (i + j)) → A → A
    myId i j A x = x
 \end{verbatim}
-\textbf{Universes are cumulative}
+\textbf{Kumulativitás}
 \begin{verbatim}
    ℕ : Set₀
    ℕ : Set₁
@@ -210,16 +211,13 @@ Universe levels may come from \textbf{any well-ordered set}, even transfinite:
 
 \end{frame}
 
-\begin{frame}[fragile]{Implementation}
+\begin{frame}[fragile]{Megvalósítás}
 
-We define a family of type theories with general universe features.
+Visszavezetjük az összes feature-t egy már ismert feature-re,
+az \textbf{induktív-rekurzív} definíciókra.
 \vspace{1em}
 
-We prove all of them consistent by reducing all fancy features to
-a single previously known feature, called \textbf{induction-recursion}.
-\vspace{1em}
-
-Induction-recursion is a type-theoretic analogue of assuming \textbf{Mahlo cardinals} in set theory.
+Az indukció-rekurzió egy típuselméleti változata a halmazelméleti \textbf{Mahlo kardinálisoknak}.
 
 \begin{verbatim}
    Univ   : Set
@@ -231,41 +229,15 @@ Induction-recursion is a type-theoretic analogue of assuming \textbf{Mahlo cardi
    Interp (Π A B) = (x : Interp A) → Interp (B x)
 \end{verbatim}
 
-
 \end{frame}
 
 
-
-
-
-%% \begin{enumerate}
-%%   \item Universe levels may come from any well-ordered set.
-%%   \item Polymorphism with bounds is allowed.
-%%   \item Universes are cumulative.
-%%   \item Levels can be manipulated arbitrarily as program data (WIP).
-%% \end{enumerate}
-
-%% Things we need to assume in order to prove the framework sensible:
-%% \begin{enumerate}
-%%   \item \textbf{Two} universes.
-%%   \item Types of certain infinitely branching trees (W-types).
-%% \end{enumerate}
-
-%% Potential further applications (in future work):
-%% \begin{itemize}
-%%   \item Information flow type systems (``secure'' and ``public'' levels).
-%%   \item Staged compilation (``runtime'' and ``compile time'' levels).
-%% \end{itemize}
-
-%% \end{frame}
-
-\begin{frame}{Publication}
+\begin{frame}{Publikáció}
 
 ``Generalized Universe Hierarchies and First-Class Universe Levels''
 \vspace{1em}
 
-Submission under review for FSCD 2021.
-
+Elbírálás alatt FSCD 2021 konferenciára.
 
 %% This talk is a side project intended for FSCD 2021 submission (in February).
 %% \vspace{1em}
@@ -280,13 +252,11 @@ Submission under review for FSCD 2021.
 
 \end{frame}
 
-
 \begin{frame}
 
-\begin{center} {\large Thank you!} \end{center}
+\begin{center} {\large Köszönöm a figyelmet!} \end{center}
 
 \end{frame}
-
 
 %% \begin{frame}[allowframebreaks]{References}
 %%   \bibliography{references}

@@ -1,13 +1,10 @@
-\frametitle{Implementation}
+\frametitle{Megvalósítás}
 
-We define a family of type theories with general universe features.
+Visszavezetjük az összes feature-t egy már ismert feature-re,
+az \textbf{induktív-rekurzív} definíciókra.
 \vspace{1em}
 
-We prove all of them consistent by reducing all fancy features to
-a single previously known feature, called \textbf{induction-recursion}.
-\vspace{1em}
-
-Induction-recursion is a type-theoretic analogue of assuming \textbf{Mahlo cardinals} in set theory.
+Az indukció-rekurzió egy típuselméleti változata a halmazelméleti \textbf{Mahlo kardinálisoknak}.
 
 \begin{verbatim}
    Univ   : Set
@@ -18,5 +15,4 @@ Induction-recursion is a type-theoretic analogue of assuming \textbf{Mahlo cardi
    Interp Nat     = ℕ
    Interp (Π A B) = (x : Interp A) → Interp (B x)
 \end{verbatim}
-
 
