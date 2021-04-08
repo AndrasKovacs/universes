@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1617866265 "prez.tex" "prez.pdf" "prez" 1617866266
+["pdflatex"] 1617869420 "prez.tex" "prez.pdf" "prez" 1617869421
   "/etc/texmf/web2c/texmf.cnf" 1541182921 1101 af7716885e081ab43982cab7b4672c1a ""
   "/home/kutta/texmf/tex/latex/metropolis/beamercolorthememetropolis.sty" 1596817469 3961 a26340357813f2d570838e33aec7d93b ""
   "/home/kutta/texmf/tex/latex/metropolis/beamerfontthememetropolis.sty" 1596817469 11439 631ed428006d7cf3f27ae648004ca47f ""
@@ -215,10 +215,10 @@
   "/usr/share/texmf/tex/latex/tipa/t3enc.def" 1414244106 26483 c461a68c34040cb0d96c43e86c012a6d ""
   "/usr/share/texmf/web2c/texmf.cnf" 1503343927 31343 93828589fb0cea665e553ee5a17ad2d4 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1541182946 3471869 af1c761f28ddda428200a4236f32f320 ""
-  "prez.aux" 1617866266 2846 07960b0491e064a73367f727739e948e ""
-  "prez.nav" 1617866266 1334 af53600e2eb4b2d23b9817c3adb4ea86 ""
-  "prez.out" 1617866266 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "prez.tex" 1617866263 7083 ed7a2e4132ad85cb16564aed2319e5d7 ""
+  "prez.aux" 1617869421 2846 07960b0491e064a73367f727739e948e ""
+  "prez.nav" 1617869421 1334 af53600e2eb4b2d23b9817c3adb4ea86 ""
+  "prez.out" 1617869421 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "prez.tex" 1617869420 7167 eef15ba7d2e5f5bad5202d35cf3f1bf0 ""
   (generated)
   "prez.pdf"
   "prez.aux"
