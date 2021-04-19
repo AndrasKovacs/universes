@@ -10,8 +10,7 @@ Danil Annenkov, Paolo Capriotti, Nicolai Kraus, and Christian Sattler.
 Steve Awodey.
 \newblock Natural models of homotopy type theory.
 \newblock {\em Math. Struct. Comput. Sci.}, 28(2):241--286, 2018.
-\newblock URL: \url{https://doi.org/10.1017/S0960129516000268}, \href
-  {http://dx.doi.org/10.1017/S0960129516000268}
+\newblock \href {https://doi.org/10.1017/S0960129516000268}
   {\path{doi:10.1017/S0960129516000268}}.
 
 \bibitem{dependentrightadjoints}
@@ -19,8 +18,7 @@ Lars Birkedal, Ranald Clouston, Bassel Mannaa, Rasmus~Ejlers M{\o}gelberg,
   Andrew~M. Pitts, and Bas Spitters.
 \newblock Modal dependent type theory and dependent right adjoints.
 \newblock {\em Math. Struct. Comput. Sci.}, 30(2):118--138, 2020.
-\newblock URL: \url{https://doi.org/10.1017/S0960129519000197}, \href
-  {http://dx.doi.org/10.1017/S0960129519000197}
+\newblock \href {https://doi.org/10.1017/S0960129519000197}
   {\path{doi:10.1017/S0960129519000197}}.
 
 \bibitem{cartmellthesis}
@@ -50,8 +48,7 @@ Peter Dybjer.
   and Programs, International Workshop TYPES'95, Torino, Italy, June 5-8, 1995,
   Selected Papers}, volume 1158 of {\em Lecture Notes in Computer Science},
   pages 120--134. Springer, 1995.
-\newblock URL: \url{https://doi.org/10.1007/3-540-61780-9\_66}, \href
-  {http://dx.doi.org/10.1007/3-540-61780-9\_66}
+\newblock \href {https://doi.org/10.1007/3-540-61780-9\_66}
   {\path{doi:10.1007/3-540-61780-9\_66}}.
 
 \bibitem{dybjer99finite}
@@ -61,32 +58,28 @@ Peter Dybjer and Anton Setzer.
   Applications, 4th International Conference, TLCA'99, L'Aquila, Italy, April
   7-9, 1999, Proceedings}, volume 1581 of {\em Lecture Notes in Computer
   Science}, pages 129--146. Springer, 1999.
-\newblock URL: \url{https://doi.org/10.1007/3-540-48959-2\_11}, \href
-  {http://dx.doi.org/10.1007/3-540-48959-2\_11}
+\newblock \href {https://doi.org/10.1007/3-540-48959-2\_11}
   {\path{doi:10.1007/3-540-48959-2\_11}}.
 
 \bibitem{indexedir}
 Peter Dybjer and Anton Setzer.
 \newblock Indexed induction-recursion.
 \newblock {\em J. Log. Algebraic Methods Program.}, 66(1):1--49, 2006.
-\newblock URL: \url{https://doi.org/10.1016/j.jlap.2005.07.001}, \href
-  {http://dx.doi.org/10.1016/j.jlap.2005.07.001}
+\newblock \href {https://doi.org/10.1016/j.jlap.2005.07.001}
   {\path{doi:10.1016/j.jlap.2005.07.001}}.
 
 \bibitem{positiveir}
 Neil Ghani, Lorenzo Malatesta, and Fredrik~Nordvall Forsberg.
 \newblock Positive inductive-recursive definitions.
 \newblock {\em Log. Methods Comput. Sci.}, 11(1), 2015.
-\newblock URL: \url{https://doi.org/10.2168/LMCS-11(1:13)2015}, \href
-  {http://dx.doi.org/10.2168/LMCS-11(1:13)2015}
+\newblock \href {https://doi.org/10.2168/LMCS-11(1:13)2015}
   {\path{doi:10.2168/LMCS-11(1:13)2015}}.
 
 \bibitem{sprop}
 Ga{\"{e}}tan Gilbert, Jesper Cockx, Matthieu Sozeau, and Nicolas Tabareau.
 \newblock Definitional proof-irrelevance without {K}.
 \newblock {\em Proc. {ACM} Program. Lang.}, 3({POPL}):3:1--3:28, 2019.
-\newblock URL: \url{https://doi.org/10.1145/3290316}, \href
-  {http://dx.doi.org/10.1145/3290316} {\path{doi:10.1145/3290316}}.
+\newblock \href {https://doi.org/10.1145/3290316} {\path{doi:10.1145/3290316}}.
 
 \bibitem{gratzer20multimodal}
 Daniel Gratzer, G.~A. Kavvos, Andreas Nuyts, and Lars Birkedal.
@@ -95,16 +88,14 @@ Daniel Gratzer, G.~A. Kavvos, Andreas Nuyts, and Lars Birkedal.
   editors, {\em {LICS} '20: 35th Annual {ACM/IEEE} Symposium on Logic in
   Computer Science, Saarbr{\"{u}}cken, Germany, July 8-11, 2020}, pages
   492--506. {ACM}, 2020.
-\newblock URL: \url{https://doi.org/10.1145/3373718.3394736}, \href
-  {http://dx.doi.org/10.1145/3373718.3394736}
+\newblock \href {https://doi.org/10.1145/3373718.3394736}
   {\path{doi:10.1145/3373718.3394736}}.
 
 \bibitem{harperpollack}
 Robert Harper and Robert Pollack.
 \newblock Type checking with universes.
 \newblock {\em Theor. Comput. Sci.}, 89(1):107--136, 1991.
-\newblock URL: \url{https://doi.org/10.1016/0304-3975(90)90108-T}, \href
-  {http://dx.doi.org/10.1016/0304-3975(90)90108-T}
+\newblock \href {https://doi.org/10.1016/0304-3975(90)90108-T}
   {\path{doi:10.1016/0304-3975(90)90108-T}}.
 
 \bibitem{kaposi2019gluing}
@@ -114,8 +105,7 @@ Ambrus Kaposi, Simon Huber, and Christian Sattler.
   Formal Structures for Computation and Deduction, {FSCD} 2019, June 24-30,
   2019, Dortmund, Germany}, volume 131 of {\em LIPIcs}, pages 25:1--25:19.
   Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik, 2019.
-\newblock URL: \url{https://doi.org/10.4230/LIPIcs.FSCD.2019.25}, \href
-  {http://dx.doi.org/10.4230/LIPIcs.FSCD.2019.25}
+\newblock \href {https://doi.org/10.4230/LIPIcs.FSCD.2019.25}
   {\path{doi:10.4230/LIPIcs.FSCD.2019.25}}.
 
 \bibitem{kiselyov14metaocaml}
@@ -126,8 +116,7 @@ Oleg Kiselyov.
   Logic Programming - 12th International Symposium, {FLOPS} 2014, Kanazawa,
   Japan, June 4-6, 2014. Proceedings}, volume 8475 of {\em Lecture Notes in
   Computer Science}, pages 86--102. Springer, 2014.
-\newblock URL: \url{https://doi.org/10.1007/978-3-319-07151-0\_6}, \href
-  {http://dx.doi.org/10.1007/978-3-319-07151-0\_6}
+\newblock \href {https://doi.org/10.1007/978-3-319-07151-0\_6}
   {\path{doi:10.1007/978-3-319-07151-0\_6}}.
 
 \bibitem{luo2012notes}
@@ -154,8 +143,8 @@ Erik Palmgren.
 Anton Setzer.
 \newblock Extending martin-l{\"{o}}f type theory by one mahlo-universe.
 \newblock {\em Arch. Math. Log.}, 39(3):155--181, 2000.
-\newblock URL: \url{https://doi.org/10.1007/s001530050140}, \href
-  {http://dx.doi.org/10.1007/s001530050140} {\path{doi:10.1007/s001530050140}}.
+\newblock \href {https://doi.org/10.1007/s001530050140}
+  {\path{doi:10.1007/s001530050140}}.
 
 \bibitem{sterling2019algebraic}
 Jonathan Sterling.
@@ -171,8 +160,7 @@ Amin Timany and Matthieu Sozeau.
   Conference on Formal Structures for Computation and Deduction, {FSCD} 2018,
   July 9-12, 2018, Oxford, {UK}}, volume 108 of {\em LIPIcs}, pages
   29:1--29:16. Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik, 2018.
-\newblock URL: \url{https://doi.org/10.4230/LIPIcs.FSCD.2018.29}, \href
-  {http://dx.doi.org/10.4230/LIPIcs.FSCD.2018.29}
+\newblock \href {https://doi.org/10.4230/LIPIcs.FSCD.2018.29}
   {\path{doi:10.4230/LIPIcs.FSCD.2018.29}}.
 
 \bibitem{hottbook}
@@ -194,8 +182,7 @@ Beta Ziliani and Matthieu Sozeau.
   the 20th {ACM} {SIGPLAN} International Conference on Functional Programming,
   {ICFP} 2015, Vancouver, BC, Canada, September 1-3, 2015}, pages 179--191.
   {ACM}, 2015.
-\newblock URL: \url{https://doi.org/10.1145/2784731.2784751}, \href
-  {http://dx.doi.org/10.1145/2784731.2784751}
+\newblock \href {https://doi.org/10.1145/2784731.2784751}
   {\path{doi:10.1145/2784731.2784751}}.
 
 \end{thebibliography}
