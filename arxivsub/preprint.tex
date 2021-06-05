@@ -351,14 +351,21 @@ Family morphisms are restrictions of so-called \emph{weak morphisms}
 on the base category is exactly a family morphism.
 
 \begin{mylemma} Every family morphism has invertible action on terms, i.e.\ there
-is an $F^{-1} : \Tm\,\Gamma\,(F\,A) \to \Tm\,\Gamma\,A$.
+  is an $F^{-1} : \Tm\,\Gamma\,(F\,A) \to \Tm\,\Gamma\,A$.
 \end{mylemma}
-\begin{proof} From the
-preservation of context extension by $F$, we know that $F$ is invertible on the zero De Bruijn
-index, so for $\q : \Tm\,(\Gamma \ext F\,A)\,(F (A[\p]))$, we have $F^{-1}\q : \Tm\,(\Gamma \ext
-F\,A)\,(A[\p])$, such that $F (F^{-1}\,\q) = \q$. If we have any $t : \Tm\,\Gamma\,(F\,A)$, we also
-have $(F^{-1}\q)[\id,\,t] : \Tm\,\Gamma\,A$, and this yields the inverse action $F^{-1}$ which acts
-on all terms.
+
+\begin{proof}
+From the $\ext$-preservation isomorphism and the defining isomorphisms of
+comprehension, we get $\q' : \Tm\,(\Gamma \ext F\,A)\,(A[\p])$ such that $F\,\q'
+= \q$ and $\q'[\p,\,F\,\q] = \q$. Now, for $t : \Tm\,\Gamma\,(F\,A)$, we
+define $F^{-1}\,t$ as $\q'[\id,\,t] : \Tm\,\Gamma\,A$. We get the following:
+\begin{alignat*}{3}
+  & F(F^{-1}\,t) = F(\q'[\id,\,t]) = (F\,\q')[\id,\,t] = \q'[\id,\,t] = t \\
+  & F^{-1}(F\,t) = \q'[\id,\,F\,t] = \q'[\id,\,(F\,\q)[\id,\,\,t]] = \q'[\p,\,F\,\q][\id,\,t]
+    = \q[\id,\,t] = t
+\end{alignat*}
+More concisely, $F$ is invertible on the generic term $\q$, which implies invertibility
+on any term.
 \end{proof}
 
 \begin{notation}
