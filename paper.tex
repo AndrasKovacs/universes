@@ -213,10 +213,11 @@ systems in this paper.
   universe polymorphism features and level computations.
 \end{enumerate}
 
-We provide an Agda formalization of the contents of the paper. The formalization
-is not complete, as we skip proofs involving an excessive number of equality
-coercions (which are more suited to informal reasoning, using equality
-reflection), and instead focus on the key points.
+We provide an Agda formalization of the contents of the paper at
+\url{https://github.com/AndrasKovacs/universes/tree/master/agda}. The
+formalization is not complete, as we skip proofs involving an excessive number
+of equality coercions (which are more suited to informal reasoning, using
+equality reflection), and instead focus on the key points.
 
 \section{Metatheory}
 \label{sec:metatheory}
@@ -300,7 +301,8 @@ There are other ways for presenting the basic categorical structure of models,
 which are nonetheless equivalent to cwfs, including natural models
 \cite{awodey18natural} and categories with attributes \cite{cartmellthesis}. We
 use the cwf presentation for its immediately algebraic character and closeness
-to conventional explicit substitution syntax.
+to conventional explicit substitutions. We consider the syntax of a type theory
+to be its initial model.
 
 \begin{notation}As De Bruijn indices are hard to read, we will mostly use
 nameful notation for binders. For example, assuming $\Nat : \{\Gamma : \Con\}
@@ -637,7 +639,7 @@ First, IR is already supported in the proof assistant Agda, and it is very
 useful to be able to sketch out ideas in a machine-checked setting. It would be
 much harder to do the same when developing semantics in set theory.
 
-Second, could we use weaker type-theoretic features, like super universes
+Second, could we use simpler type-theoretic features, like super universes
 \cite{Palmgren98onuniverses} or Mahlo universes \cite{setzer00mahlo}? These are
 sufficient to model transfinite hierarchies. However, it is not clear how to
 additionally support \emph{recursive sub-universes}, which in our work corresponds to
