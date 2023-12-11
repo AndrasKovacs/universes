@@ -28,7 +28,7 @@ record LvlStruct : Set₁ where
   acyclic : ∀ {i} → i < i → ⊥
   acyclic {i} p = go wf p where
     go : ∀ {i} → Acc _<_ i → i < i → ⊥
-    go {i} (acc f) q = go (f i q) q
+    go {i} (acc f) q = go (f q) q
 
 module IR-Universe (lvl : LvlStruct) where
   open LvlStruct lvl public
@@ -61,20 +61,21 @@ module IR-Universe (lvl : LvlStruct) where
   Elⁱʳ (Σ' a b)     = ∃ λ x → Elⁱʳ (b x)
   Elⁱʳ (W' a b)     = W (Elⁱʳ a) (λ x → Elⁱʳ (b x))
 
+
   -- Interpreting levels & lifts
   --------------------------------------------------------------------------------
 
   U< : ∀ {i} {{_ : Acc _<_ i}} j → j < i → Set
-  U< {i} {{acc f}} j p = Uⁱʳ {j} (U< {j}{{f j p}})
+  U< {i} {{acc f}} j p = Uⁱʳ {j} (U< {j}{{f p}})
 
-  U : Lvl → Set
+  U : Lvl → Set   -- semantic universe
   U i = Uⁱʳ {i} (U< {i} {{wf}})
 
   El : ∀ {i} → U i → Set
   El {i} = Elⁱʳ {i}{U< {i}{{wf}}}
 
   U<-compute : ∀ {i a j p} → U< {i}{{a}} j p ≡ U j
-  U<-compute {i} {acc f} {j} {p} = (λ a → Uⁱʳ (U< {{a}})) & Acc-prop (f j p) wf
+  U<-compute {i} {acc f} {j} {p} = (λ a → Uⁱʳ (U< {{a}})) & Acc-prop (f p) wf
 
   Lift   : ∀ {i j} → i < j → U i → U j
   ElLift : ∀ {i j} p a → El (Lift {i}{j} p a) ≡ El a

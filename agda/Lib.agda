@@ -36,11 +36,11 @@ postulate
   exti : ∀{i j}{A : Set i}{B : A → Set j}{f g : ∀ {x} → B x}
           → ((x : A) → f {x} ≡ g {x}) → (λ {x} → f {x}) ≡ g
 
-unAcc : ∀ {α β A R i} → Acc {α}{β}{A} R i → ∀ j → R j i → Acc R j
+unAcc : ∀ {α β A R i} → Acc {α}{β}{A} R i → ∀ {j} → R j i → Acc R j
 unAcc (acc f) = f
 
 Acc-prop : ∀ {α β A R i}(p q : Acc {α}{β}{A} R i) → p ≡ q
-Acc-prop (acc f) (acc g) = acc & ext λ j → ext λ p → Acc-prop (f j p) (g j p)
+Acc-prop (acc f) (acc g) = acc & exti λ j → ext λ p → Acc-prop (f p) (g p)
 
 happly : ∀ {α β}{A : Set α}{B : Set β}{f g : A → B} → f ≡ g → ∀ a → f a ≡ g a
 happly refl a = refl
